@@ -1,0 +1,39 @@
+# Install pre-commit hooks via:
+# pre-commit install
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.4.0
+  hooks:
+    - id: double-quote-string-fixer
+    - id: end-of-file-fixer
+    - id: fix-encoding-pragma
+    - id: mixed-line-ending
+    - id: trailing-whitespace
+    - id: check-json
+
+# yapf = yet another python formatter
+- repo: https://github.com/pre-commit/mirrors-yapf
+  rev: v0.30.0
+  hooks:
+  - id: yapf
+    name: yapf
+    args: ["-i"]
+
+- repo: local
+  hooks:
+  - id: pylint
+    language: system
+    types: [file, python]
+    name: pylint
+    description: "This hook runs the pylint static code analyzer"
+    exclude: &exclude_files >
+      (?x)^(
+          docs/.*|
+      )$
+    entry: pylint
+
+  - id: version-number
+    name: Check version numbers
+    entry: python ./.github/check_version.py
+    language: system
+    files: '^(setup.json)|(qp2/__init__.py)'

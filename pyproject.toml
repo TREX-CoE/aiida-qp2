@@ -1,0 +1,18 @@
+[tool.pylint.format]
+max-line-length = 125
+
+[tool.pylint.messages_control]
+disable = [
+    "too-many-ancestors",
+    "invalid-name",
+    "duplicate-code",
+]
+
+[tool.pytest.ini_options]
+python_files = "test_*.py example_*.py"
+filterwarnings = [
+    "ignore::DeprecationWarning:aiida:",
+    "ignore::DeprecationWarning:plumpy:",
+    "ignore::DeprecationWarning:django:",
+    "ignore::DeprecationWarning:yaml:",
+]
