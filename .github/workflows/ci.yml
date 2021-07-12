@@ -50,7 +50,8 @@ jobs:
         AIIDA_TEST_BACKEND: ${{ matrix.backend }}
         # show timings of tests
         PYTEST_ADDOPTS: "--durations=0"
-      run: py.test --cov qp2 --cov-append .
+     # DISABLE tests (below) for now since installation of QP is cumbersome
+     # run: py.test --cov qp2 --cov-append .
 
   docs:
     runs-on: ubuntu-latest
