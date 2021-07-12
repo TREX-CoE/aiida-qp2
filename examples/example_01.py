@@ -7,8 +7,8 @@ Usage: ./example_01.py
 from os import path
 import click
 from aiida import cmdline, engine
-from aiida.plugins import DataFactory, CalculationFactory
-from qp2 import helpers
+from aiida.plugins import CalculationFactory
+from aiida.orm import Dict
 
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
 
@@ -19,36 +19,28 @@ def test_run(qp2_code):
     Uses test helpers to create AiiDA Code on the fly.
     """
     if not qp2_code:
-        # get code
-        computer = helpers.get_computer()
-        qp2_code = helpers.get_code(entry_point='qp2', computer=computer)
+        raise Exception('You forgot to provide the qp2 code as an input')
 
     # Prepare input parameters
-    DiffParameters = DataFactory('qp2')
-    parameters = DiffParameters({'ignore-case': True})
+    ezfio_name = 'hcn.ezfio'
+    qp2_commands = [f'set_file {ezfio_name}', 'run scf']
 
-    SinglefileData = DataFactory('singlefile')
-    file1 = SinglefileData(file=path.join(INPUT_DIR, 'file1.txt'))
-    file2 = SinglefileData(file=path.join(INPUT_DIR, 'file2.txt'))
+    ezfio_tar = path.join(INPUT_DIR, f'{ezfio_name}.tar.gz')
+    prepend_commands = [f'cp {ezfio_tar} .']
 
-    # set up calculation
-    inputs = {
-        'code': qp2_code,
-        'parameters': parameters,
-        'file1': file1,
-        'file2': file2,
-        'metadata': {
-            'description': 'Test job submission with the qp2 plugin',
-        },
+    qp2_parameters = {
+        'qp_prepend': prepend_commands,
+        'qp_commands': qp2_commands,
+        'ezfio': ezfio_name
     }
 
-    # Note: in order to submit your calculation to the aiida daemon, do:
-    # from aiida.engine import submit
-    # future = submit(CalculationFactory('qp2'), **inputs)
-    result = engine.run(CalculationFactory('qp2'), **inputs)
+    inputs = {'code': qp2_code, 'parameters': Dict(dict=qp2_parameters)}
+    #file1 = SinglefileData(file=os.path.join(TEST_DIR, 'input_files', 'file1.txt'))
 
-    computed_diff = result['qp2'].get_content()
-    print('Computed diff between files: \n{}'.format(computed_diff))
+    result = engine.run(CalculationFactory('qp2'), **inputs)
+    energy = float(result['output_energy'])
+
+    print(f'Computed SCF energy: \n  {energy}')
 
 
 @click.command()
@@ -57,9 +49,9 @@ def test_run(qp2_code):
 def cli(code):
     """Run example.
 
-    Example usage: $ ./example_01.py --code diff@localhost
+    Example usage: $ ./example_01.py --code qp2@localhost
 
-    Alternative (creates diff@localhost-test code): $ ./example_01.py
+    Alternative (creates qp2@localhost-test code): $ ./example_01.py
 
     Help: $ ./example_01.py --help
     """
