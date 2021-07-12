@@ -15,13 +15,13 @@
     "version": "0.1.0a",
     "entry_points": {
         "aiida.data": [
-            "qp2 = qp2.data:DiffParameters"
+            "qp2 = qp2.data:QpParameters"
         ],
         "aiida.calculations": [
-            "qp2 = qp2.calculations:DiffCalculation"
+            "qp2 = qp2.calculations:QpCalculation"
         ],
         "aiida.parsers": [
-            "qp2 = qp2.parsers:DiffParser"
+            "qp2 = qp2.parsers:QpParser"
         ],
         "aiida.cmdline.data": [
             "qp2 = qp2.cli:data_cli"

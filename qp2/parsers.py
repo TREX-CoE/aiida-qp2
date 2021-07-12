@@ -8,12 +8,12 @@ from aiida.engine import ExitCode
 from aiida.parsers.parser import Parser
 from aiida.plugins import CalculationFactory
 from aiida.common import exceptions
-from aiida.orm import SinglefileData
+from aiida.orm import Float
 
-DiffCalculation = CalculationFactory('qp2')
+QpCalculation = CalculationFactory('qp2')
 
 
-class DiffParser(Parser):
+class QpParser(Parser):
     """
     Parser class for parsing output of calculation.
     """
@@ -21,14 +21,14 @@ class DiffParser(Parser):
         """
         Initialize Parser instance
 
-        Checks that the ProcessNode being passed was produced by a DiffCalculation.
+        Checks that the ProcessNode being passed was produced by a QpCalculation.
 
         :param node: ProcessNode of calculation
         :param type node: :class:`aiida.orm.ProcessNode`
         """
         super().__init__(node)
-        if not issubclass(node.process_class, DiffCalculation):
-            raise exceptions.ParsingError('Can only parse DiffCalculation')
+        if not issubclass(node.process_class, QpCalculation):
+            raise exceptions.ParsingError('Can only parse QpCalculation')
 
     def parse(self, **kwargs):
         """
@@ -49,8 +49,18 @@ class DiffParser(Parser):
 
         # add output file
         self.logger.info("Parsing '{}'".format(output_filename))
-        with self.retrieved.open(output_filename, 'rb') as handle:
-            output_node = SinglefileData(file=handle)
-        self.out('qp2', output_node)
+        with self.retrieved.open(output_filename, 'r') as f_out:
+            scf_en_found = False
+
+            for line in f_out:
+                if 'SCF energy' in line:
+                    data = line.split()
+                    scf_en_found = True
+
+            if scf_en_found:
+                energy = Float(float(data[-1]))
+                self.out('output_energy', energy)
+            else:
+                return self.exit_codes.ERROR_MISSING_ENERGY
 
         return ExitCode(0)

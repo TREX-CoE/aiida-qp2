@@ -26,12 +26,12 @@ def data_cli():
 @decorators.with_dbenv()
 def list_():  # pylint: disable=redefined-builtin
     """
-    Display all DiffParameters nodes
+    Display all QpParameters nodes
     """
-    DiffParameters = DataFactory('qp2')
+    QpParameters = DataFactory('qp2')
 
     qb = QueryBuilder()
-    qb.append(DiffParameters)
+    qb.append(QpParameters)
     results = qb.all()
 
     s = ''
@@ -49,7 +49,7 @@ def list_():  # pylint: disable=redefined-builtin
               help='Write output to file (default: print to stdout).')
 @decorators.with_dbenv()
 def export(node, outfile):
-    """Export a DiffParameters node (identified by PK, UUID or label) to plain text."""
+    """Export a QpParameters node (identified by PK, UUID or label) to plain text."""
     string = str(node)
 
     if outfile:
