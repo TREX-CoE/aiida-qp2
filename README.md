@@ -17,12 +17,12 @@ intended to help developers get started with their AiiDA plugins.
   * [`ci.yml`](.github/workflows/ci.yml): runs tests, checks test coverage and builds documentation at every new commit
   * [`publish-on-pypi.yml`](.github/workflows/publish-on-pypi.yml): automatically deploy git tags to PyPI - just generate a [PyPI API token](https://pypi.org/help/#apitoken) for your PyPI account and add it to the `pypi_token` secret of your github repository
 * [`qp2/`](qp2/): The main source code of the plugin package
-  * [`data/`](qp2/data/): A new `DiffParameters` data class, used as input to the `DiffCalculation` `CalcJob` class
-  * [`calculations.py`](qp2/calculations.py): A new `DiffCalculation` `CalcJob` class
-  * [`cli.py`](qp2/cli.py): Extensions of the `verdi data` command line interface for the `DiffParameters` class
-  * [`helpers.py`](qp2/helpers.py): Helpers for setting up an AiiDA code for `diff` automatically
-  * [`parsers.py`](qp2/parsers.py): A new `Parser` for the `DiffCalculation`
-* [`docs/`](docs/): A documentation template ready for publication on [Read the Docs](http://aiida-diff.readthedocs.io/en/latest/)
+  * [`data/`](qp2/data/): A new `QpParameters` data class, used as input to the `QpCalculation` `CalcJob` class
+  * [`calculations.py`](qp2/calculations.py): A new `QpCalculation` `CalcJob` class
+  * [`cli.py`](qp2/cli.py): Extensions of the `verdi data` command line interface for the `QpParameters` class
+  * [`helpers.py`](qp2/helpers.py): Helpers for setting up an AiiDA code for `qp2` automatically
+  * [`parsers.py`](qp2/parsers.py): A new `Parser` for the `QpCalculation`
+* [`docs/`](docs/): A documentation template ready for publication on [Read the Docs](http://aiida-qp2.readthedocs.io/en/latest/)
 * [`examples/`](examples/): An example of how to submit a calculation using this plugin
 * [`tests/`](tests/): Basic regression tests using the [pytest](https://docs.pytest.org/en/latest/) framework (submitting a calculation, ...). Install `pip install -e .[testing]` and run `pytest`.
 * [`.coveragerc`](.coveragerc): Configuration of [coverage.py](https://coverage.readthedocs.io/en/latest) tool reporting which lines of your plugin are covered by tests
@@ -40,18 +40,18 @@ intended to help developers get started with their AiiDA plugins.
 
 See also the following video sequences from the 2019-05 AiiDA tutorial:
 
- * [aiida-diff setup.json](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=240s)
- * [run aiida-diff example calculation](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=403s)
- * [aiida-diff CalcJob plugin](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=685s)
- * [aiida-diff Parser plugin](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=936s)
- * [aiida-diff computer/code helpers](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=1238s)
- * [aiida-diff input data (with validation)](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=1353s)
- * [aiida-diff cli](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=1621s)
- * [aiida-diff tests](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=1931s)
+ * [aiida-qp2 setup.json](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=240s)
+ * [run aiida-qp2 example calculation](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=403s)
+ * [aiida-qp2 CalcJob plugin](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=685s)
+ * [aiida-qp2 Parser plugin](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=936s)
+ * [aiida-qp2 computer/code helpers](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=1238s)
+ * [aiida-qp2 input data (with validation)](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=1353s)
+ * [aiida-qp2 cli](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=1621s)
+ * [aiida-qp2 tests](https://www.youtube.com/watch?v=2CxiuiA1uVs&t=1931s)
  * [Adding your plugin to the registry](https://www.youtube.com/watch?v=760O2lDB-TM&t=112s)
  * [pre-commit hooks](https://www.youtube.com/watch?v=760O2lDB-TM&t=333s)
 
-For more information, see the [developer guide](https://aiida-diff.readthedocs.io/en/latest/developer_guide) of your plugin.
+For more information, see the [developer guide](https://aiida-qp2.readthedocs.io/en/latest/developer_guide) of your plugin.
 
 
 ## Features
@@ -63,18 +63,18 @@ For more information, see the [developer guide](https://aiida-diff.readthedocs.i
    inputs['file2'] = SinglefileData(file='/path/to/file2')
    ```
 
- * Specify command line options via a python dictionary and `DiffParameters`:
+ * Specify command line options via a python dictionary and `QpParameters`:
    ```python
    d = { 'ignore-case': True }
-   DiffParameters = DataFactory('qp2')
-   inputs['parameters'] = DiffParameters(dict=d)
+   QpParameters = DataFactory('qp2')
+   inputs['parameters'] = QpParameters(dict=d)
    ```
 
- * `DiffParameters` dictionaries are validated using [voluptuous](https://github.com/alecthomas/voluptuous).
+ * `QpParameters` dictionaries are validated using [voluptuous](https://github.com/alecthomas/voluptuous).
    Find out about supported options:
    ```python
-   DiffParameters = DataFactory('qp2')
-   print(DiffParameters.schema.schema)
+   QpParameters = DataFactory('qp2')
+   print(QpParameters.schema.schema)
    ```
 
 ## Installation

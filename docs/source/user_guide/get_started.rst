@@ -38,5 +38,5 @@ If you have already set up your own qp2 code using
 Available calculations
 ++++++++++++++++++++++
 
-.. aiida-calcjob:: DiffCalculation
+.. aiida-calcjob:: QpCalculation
     :module: qp2.calculations
