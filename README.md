@@ -53,7 +53,7 @@ See also the following video sequences from the 2019-05 AiiDA tutorial:
 
 For more information, see the [developer guide](https://aiida-qp2.readthedocs.io/en/latest/developer_guide) of your plugin.
 
-
+s
 ## Features
 
  * Add input files using `SinglefileData`:
