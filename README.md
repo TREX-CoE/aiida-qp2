@@ -1,5 +1,5 @@
-[![Build Status](https://github.com/q-posev/aiida-qp2/workflows/ci/badge.svg?branch=master)](https://github.com/q-posev/aiida-qp2/actions)
-[![Coverage Status](https://coveralls.io/repos/github/q-posev/aiida-qp2/badge.svg?branch=master)](https://coveralls.io/github/q-posev/aiida-qp2?branch=master)
+[![Build Status](https://github.com/TREX-CoE/aiida-qp2/workflows/ci/badge.svg?branch=master)](https://github.com/q-posev/aiida-qp2/actions)
+[![Coverage Status](https://coveralls.io/repos/github/TREX-CoE/aiida-qp2/badge.svg?branch=master)](https://coveralls.io/github/q-posev/aiida-qp2?branch=master)
 [![Docs status](https://readthedocs.org/projects/qp2/badge)](http://qp2.readthedocs.io/)
 [![PyPI version](https://badge.fury.io/py/qp2.svg)](https://badge.fury.io/py/qp2)
 
