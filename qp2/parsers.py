@@ -60,7 +60,8 @@ class QpParser(Parser):
             if scf_en_found:
                 energy = Float(float(data[-1]))
                 self.out('output_energy', energy)
-            else:
-                return self.exit_codes.ERROR_MISSING_ENERGY
+            # TEMPORARILY disable this exit code to check qp_create_ezfio
+            #else:
+            #    return self.exit_codes.ERROR_MISSING_ENERGY
 
         return ExitCode(0)
