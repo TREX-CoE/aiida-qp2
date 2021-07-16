@@ -20,7 +20,6 @@ intended to help developers get started with their AiiDA plugins.
   * [`data/`](qp2/data/): A new `QpParameters` data class, used as input to the `QpCalculation` `CalcJob` class
   * [`calculations.py`](qp2/calculations.py): A new `QpCalculation` `CalcJob` class
   * [`cli.py`](qp2/cli.py): Extensions of the `verdi data` command line interface for the `QpParameters` class
-  * [`helpers.py`](qp2/helpers.py): Helpers for setting up an AiiDA code for `qp2` automatically
   * [`parsers.py`](qp2/parsers.py): A new `Parser` for the `QpCalculation`
 * [`docs/`](docs/): A documentation template ready for publication on [Read the Docs](http://aiida-qp2.readthedocs.io/en/latest/)
 * [`examples/`](examples/): An example of how to submit a calculation using this plugin
@@ -70,13 +69,6 @@ For more information, see the [developer guide](https://aiida-qp2.readthedocs.io
    inputs['parameters'] = QpParameters(dict=d)
    ```
 
- * `QpParameters` dictionaries are validated using [voluptuous](https://github.com/alecthomas/voluptuous).
-   Find out about supported options:
-   ```python
-   QpParameters = DataFactory('qp2')
-   print(QpParameters.schema.schema)
-   ```
-
 ## Installation
 
 ```shell
@@ -84,7 +76,6 @@ pip install qp2
 verdi quicksetup  # better to set up a new profile
 verdi plugin list aiida.calculations  # should now show your calclulation plugins
 ```
-
 
 ## Usage
 
@@ -119,6 +110,7 @@ See the [developer guide](http://qp2.readthedocs.io/en/latest/developer_guide/in
 ## License
 
 MIT
+
 ## Contact
 
 posenitskiy@irsamc.ups-tlse.fr
