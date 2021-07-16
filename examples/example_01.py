@@ -9,6 +9,7 @@ import click
 from aiida import cmdline, engine
 from aiida.plugins import CalculationFactory
 from aiida.orm import Dict, load_code, load_computer
+from aiida.common.exceptions import NotExistent
 
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
 
@@ -21,12 +22,15 @@ def test_run_scf(qp2_code, computer):
         try:
             computer = load_computer('localhost')
         except:
-            raise Exception('You forgot to provide the --computer argument')
+            raise Exception('You forgot to provide the --computer argument'
+                            ) from NotExistent
+
     if not qp2_code:
         try:
             qp2_code = load_code('qp2@localhost')
         except:
-            raise Exception('You forgot to provide the --code argument')
+            raise Exception(
+                'You forgot to provide the --code argument') from NotExistent
 
     # Prepare input parameters
     ezfio_name = 'hcn.ezfio'

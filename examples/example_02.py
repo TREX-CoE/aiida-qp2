@@ -7,10 +7,10 @@ Usage:
   (2) verdi run example_02.py
 """
 from os import path
+from pymatgen.core import Molecule
 import click
 from aiida import orm, engine, cmdline
 from aiida.common.exceptions import NotExistent
-from pymatgen.core import Molecule
 
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
 
@@ -19,16 +19,17 @@ def load_aiida_setup():
     """Load localhost computer and qp2@localhost from the AiiDA database.
 
     """
-
     #try:
     #    aiida_profile = load_profile(profile)
     #except:
-    #    raise Exception('Create the profile for this example')
+    #    raise Exception('Create the profile for this example') from NotExistent
 
+    # Load the localhost computer
     try:
         computer = orm.load_computer('localhost')
-    except NotExistent:
-        raise Exception('Create the localhost computer for this example')
+    except:
+        raise Exception(
+            'Create the localhost computer for this example') from NotExistent
 
     # Create or load the qp2 code
     try:
@@ -47,7 +48,6 @@ def test_run_create_ezfio(code, computer):
 
     Runs on the localhost computer using qp2@localhost code
     """
-
     # Set up inputs
     builder = code.get_builder()
 
@@ -111,7 +111,6 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
 
     Runs on the localhost computer using qp2@localhost code
     """
-
     builder_scf = code.get_builder()
     #ezfio_name = 'hcn.ezfio'
 
@@ -185,7 +184,6 @@ def cli():
 
     Help: $ ./example_02.py --help
     """
-
     (code, computer) = load_aiida_setup()
     ezfio_RemoteData = test_run_create_ezfio(code, computer)
     energy_scf = test_run_scf_from_ezfio(code, computer, ezfio_RemoteData)
