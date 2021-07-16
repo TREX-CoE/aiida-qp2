@@ -95,12 +95,15 @@ class QpCalculation(CalcJob):
         # The remote copy list is useful to avoid unnecessary file transfers between the machine where the engine
         # runs and where the calculation jobs are executed. For example, a calculation job completed on a remote cluster
         # and now you want to launch a second one, that requires some of the output files of the first run as its inputs.
-        #calcinfo.remote_copy_list = []
         # TODO current procedure relies on copying the EZFIO tar.gz to the local repository where AiiDA runs # pylint: disable=fixme
         # TODO perhaps this can be avoided by providing a path on the remote machine instead of the local one # pylint: disable=fixme
-        calcinfo.remote_copy_list = [
-            (self.inputs.metadata.computer.uuid, self.inputs.ezfio.get_remote_path(), './')
-            ] if not 'xyz' in parameters.keys() else []
+        if 'ezfio' in self.inputs.keys():
+            calcinfo.remote_copy_list = [
+                (self.inputs.metadata.computer.uuid, self.inputs.ezfio.get_remote_path(), './')
+                ] if not 'xyz' in parameters.keys() else []
+        else:
+            calcinfo.remote_copy_list = []
+
 
         # retrieve_list will copy the files from the remote machine to the local one (where AiiDA runs)
         # This is not desirable for big files like EZFIO tar.gz or HDF5 file
