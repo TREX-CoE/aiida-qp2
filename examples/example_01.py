@@ -8,18 +8,26 @@ from os import path
 import click
 from aiida import cmdline, engine
 from aiida.plugins import CalculationFactory
-from aiida.orm import Dict
+from aiida.orm import Dict, load_code, load_computer
 
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
 
 
-def test_run(qp2_code):
+def test_run(qp2_code, computer):
     """Run a calculation on the localhost computer.
 
     Uses test helpers to create AiiDA Code on the fly.
     """
+    if not computer:
+        try:
+            computer = load_computer('localhost')
+        except:
+            raise Exception('You forgot to provide the --computer argument')
     if not qp2_code:
-        raise Exception('You forgot to provide the qp2 code as an input')
+        try:
+            qp2_code = load_code('qp2@localhost')
+        except:
+            raise Exception('You forgot to provide the --code argument')
 
     # Prepare input parameters
     ezfio_name = 'hcn.ezfio'
@@ -31,11 +39,16 @@ def test_run(qp2_code):
     qp2_parameters = {
         'qp_prepend': prepend_commands,
         'qp_commands': qp2_commands,
-        'ezfio': ezfio_name
+        'ezfio_name': ezfio_name
     }
 
-    inputs = {'code': qp2_code, 'parameters': Dict(dict=qp2_parameters)}
-    #file1 = SinglefileData(file=os.path.join(TEST_DIR, 'input_files', 'file1.txt'))
+    inputs = {
+        'code': qp2_code,
+        'parameters': Dict(dict=qp2_parameters),
+        'metadata': {
+            'computer': computer
+        }
+    }
 
     result = engine.run(CalculationFactory('qp2'), **inputs)
     energy = float(result['output_energy'])
@@ -46,16 +59,18 @@ def test_run(qp2_code):
 @click.command()
 @cmdline.utils.decorators.with_dbenv()
 @cmdline.params.options.CODE()
-def cli(code):
+@cmdline.params.options.COMPUTER()
+def cli(code, computer):
     """Run example.
 
-    Example usage: $ ./example_01.py --code qp2@localhost
+    Example usage: $ ./example_01.py --code=qp2@localhost --computer=localhost
 
-    Alternative (creates qp2@localhost-test code): $ ./example_01.py
+    Alternative (loads qp2@localhost code and localhost computer): $ ./example_01.py
 
     Help: $ ./example_01.py --help
     """
-    test_run(code)
+
+    test_run(code, computer)
 
 
 if __name__ == '__main__':
