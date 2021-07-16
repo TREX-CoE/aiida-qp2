@@ -13,10 +13,9 @@ from aiida.orm import Dict, load_code, load_computer
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
 
 
-def test_run(qp2_code, computer):
+def test_run_scf(qp2_code, computer):
     """Run a calculation on the localhost computer.
 
-    Uses test helpers to create AiiDA Code on the fly.
     """
     if not computer:
         try:
@@ -61,16 +60,16 @@ def test_run(qp2_code, computer):
 @cmdline.params.options.CODE()
 @cmdline.params.options.COMPUTER()
 def cli(code, computer):
-    """Run example.
+    """Run example_01: SCF calculation using QP2 on existing EZFIO database.
 
-    Example usage: $ ./example_01.py --code=qp2@localhost --computer=localhost
+    Example usage: $ ./example_01.py --code qp2@localhost --computer localhost
 
     Alternative (loads qp2@localhost code and localhost computer): $ ./example_01.py
 
     Help: $ ./example_01.py --help
     """
 
-    test_run(code, computer)
+    test_run_scf(code, computer)
 
 
 if __name__ == '__main__':
