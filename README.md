@@ -7,7 +7,7 @@
 
 AiiDA plugin for the Quanum Package 2.0
 
-This plugin is the default output of the
+This plugin is the modified output of the
 [AiiDA plugin cutter](https://github.com/aiidateam/aiida-plugin-cutter),
 intended to help developers get started with their AiiDA plugins.
 
@@ -22,7 +22,7 @@ intended to help developers get started with their AiiDA plugins.
   * [`cli.py`](qp2/cli.py): Extensions of the `verdi data` command line interface for the `QpParameters` class
   * [`parsers.py`](qp2/parsers.py): A new `Parser` for the `QpCalculation`
 * [`docs/`](docs/): A documentation template ready for publication on [Read the Docs](http://aiida-qp2.readthedocs.io/en/latest/)
-* [`examples/`](examples/): An example of how to submit a calculation using this plugin
+* [`examples/`](examples/): Examples of how to submit a calculation using this plugin
 * [`tests/`](tests/): Basic regression tests using the [pytest](https://docs.pytest.org/en/latest/) framework (submitting a calculation, ...). Install `pip install -e .[testing]` and run `pytest`.
 * [`.coveragerc`](.coveragerc): Configuration of [coverage.py](https://coverage.readthedocs.io/en/latest) tool reporting which lines of your plugin are covered by tests
 * [`.gitignore`](.gitignore): Telling git which files to ignore
@@ -53,7 +53,7 @@ See also the following video sequences from the 2019-05 AiiDA tutorial:
 For more information, see the [developer guide](https://aiida-qp2.readthedocs.io/en/latest/developer_guide) of your plugin.
 
 
-## Features
+## Features (TODO)
 
  * Add input files using `SinglefileData`:
    ```python
@@ -85,7 +85,8 @@ A quick demo of how to submit a calculation:
 ```shell
 verdi daemon start     # make sure the daemon is running
 cd examples
-./example_01.py        # run test calculation
+./example_01.py        # run simple SCF calculation on existing EZFIO database
+./example_02.py        # run more advanced 2-step workflow
 verdi process list -a  # check record of calculation
 ```
 
