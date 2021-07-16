@@ -35,7 +35,8 @@
         "sqlalchemy<1.4",
         "six",
         "psycopg2-binary<2.9",
-        "voluptuous"
+        "voluptuous",
+        "pymatgen>=3.3.5"
     ],
     "extras_require": {
         "testing": [
@@ -43,7 +44,8 @@
             "wheel~=0.31",
             "coverage",
             "pytest~=6.0",
-            "pytest-cov"
+            "pytest-cov",
+            "pymatgen"
         ],
         "pre-commit": [
             "pre-commit~=2.2",

@@ -43,7 +43,7 @@ jobs:
 #   - name: Install python dependencies
 #     run: |
 #       pip install --upgrade pip
-#       pip install -e .[testing,pymatgen]
+#       pip install -e .[testing]
 #       reentry scan -r aiida
 #
 #   - name: Run test suite
@@ -83,7 +83,7 @@ jobs:
     - name: Install python dependencies
       run: |
         pip install --upgrade pip
-        pip install -e .[pre-commit,docs,testing,pymatgen]
+        pip install -e .[pre-commit,docs,testing]
         reentry scan -r aiida
     - name: Run pre-commit
       run: |
