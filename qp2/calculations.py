@@ -4,9 +4,15 @@ Calculations provided by qp2.
 
 Register calculations via the "aiida.calculations" entry point in setup.json.
 """
+
+# needed in _unpack function
+from collections.abc import Sequence
+
 from aiida.common import CalcInfo, CodeInfo
 from aiida.engine import CalcJob
 from aiida.orm import Dict, Float, Code, StructureData, RemoteData
+from aiida.plugins import DataFactory
+from pymatgen.core.periodic_table import Element
 
 
 class QpCalculation(CalcJob):
@@ -16,8 +22,9 @@ class QpCalculation(CalcJob):
     """
     # Defaults
     _INPUT_FILE = 'aiida.inp'
-    _OUTPUT_FILE = 'aiida.out'
     _INPUT_COORDS_FILE = 'aiida.coords.xyz'
+    _BASIS_FILE = 'aiida-basis-set'
+    _PSEUDO_FILE = 'aiida-pseudo'
 
     @classmethod
     def define(cls, spec):
@@ -32,6 +39,22 @@ class QpCalculation(CalcJob):
         spec.input('ezfio', valid_type=RemoteData, required=False, help='The EZFIO database (without .tar.gz).')
         spec.input('settings', valid_type=Dict, required=False, help='Additional input parameters.')
         spec.input('code', valid_type=Code, required=False, help='The `Code` to use for this job.')
+
+        spec.input_namespace(
+            'basissets',
+            dynamic=True,
+            required=False,
+            validator=validate_basissets_namespace,
+            help=('A dictionary of basissets to be used in the calculations: key is the atomic symbol,'
+                  ' value is either a single basisset.'))
+
+        spec.input_namespace(
+            'pseudos',
+            dynamic=True,
+            required=False,
+            validator=validate_pseudos_namespace,
+            help=('A dictionary of pseudopotentials to be used in the calculations: key is the atomic symbol,'
+                  ' value is a single pseudopotential.'))
 
         spec.input('metadata.options.output_filename', valid_type=str, default='aiida-qp2.out')
         # `output_ezfio_basename` and `computer` options required to store the output EZFIO tar.gz file as RemoteData node
@@ -103,6 +126,26 @@ class QpCalculation(CalcJob):
                 ] if not 'xyz' in parameters.keys() else []
         else:
             calcinfo.remote_copy_list = []
+
+
+        if 'basissets' in self.inputs:
+            #validate_basissets(inp, self.inputs.basissets, self.inputs.structure if 'structure' in self.inputs else None)
+            with open(folder.get_abs_path(self._BASIS_FILE), 'w') as fhandle:
+                for elem in self.inputs.basissets.keys():
+                    elem_name = Element(elem).long_name
+                    fhandle.write(f'{elem_name.upper()}\n')
+                    self.inputs.basissets[elem].to_qp(fhandle)
+                    fhandle.write('\n')
+
+
+        if 'pseudos' in self.inputs:
+            #validate_pseudos(inp, self.inputs.pseudos, self.inputs.structure if 'structure' in self.inputs else None)
+            with open(folder.get_abs_path(self._PSEUDO), 'w') as fhandle:
+                for elem in self.inputs.pseudos.keys():
+                    elem_name = Element(elem).long_name
+                    fhandle.write(f'{elem_name.upper()}\n')
+                    self.inputs.pseudos[elem].to_gamess(fhandle)
+                    fhandle.write('\n')
 
 
         # retrieve_list will copy the files from the remote machine to the local one (where AiiDA runs)
@@ -196,5 +239,48 @@ class QpCalculation(CalcJob):
 
         return '\n'.join(input_list)
 
+
+# the code below is copied from the utils/data_helpers.py of the aiida-cp2k plugin
+# https://github.com/aiidateam/aiida-cp2k/blob/develop/aiida_cp2k/utils/datatype_helpers.py
+
+def validate_basissets_namespace(basissets, _):
+    """A input_namespace validator to ensure passed down basis sets have the correct type."""
+    return _validate_gdt_namespace(basissets, DataFactory('gaussian.basisset'), 'basis set')
+
+
+def validate_pseudos_namespace(pseudos, _):
+    """A input_namespace validator to ensure passed down pseudopentials have the correct type."""
+    return _validate_gdt_namespace(pseudos, DataFactory('gaussian.pseudo'), 'pseudo')
+
+def _validate_gdt_namespace(entries, gdt_cls, attr):
+    """Common namespace validator for both basissets and pseudos"""
+
+    identifiers = []
+
+    for kind, gdt_instance in _unpack(entries):
+        if not isinstance(gdt_instance, gdt_cls):
+            return f"invalid {attr} for '{kind}' specified"
+
+        identifier = (gdt_instance.element, gdt_instance.name)
+
+        if identifier in identifiers:
+            # note: this should be possible for basissets with different versions
+            #       but at this point we should require some format for the key to match it
+            return f'{attr} for kind {gdt_instance.element} ({gdt_instance.name}) specified multiple times'
+
+        identifiers += [identifier]
+
+    return None
+
+
+def _unpack(adict):
+    """Unpack any lists as values into single elements for the key"""
+
+    for key, value in adict.items():
+        if isinstance(value, Sequence):
+            for item in value:
+                yield (key, item)
+        else:
+            yield (key, value)
 
 #EOF
