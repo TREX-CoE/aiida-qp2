@@ -12,3 +12,4 @@
 build/
 dist/
 pip-wheel-metadata/
+examples/*.pdf
