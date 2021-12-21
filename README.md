@@ -1,9 +1,9 @@
 [![Build Status](https://github.com/TREX-CoE/aiida-qp2/workflows/ci/badge.svg?branch=master)](https://github.com/q-posev/aiida-qp2/actions)
 [![Coverage Status](https://coveralls.io/repos/github/TREX-CoE/aiida-qp2/badge.svg?branch=master)](https://coveralls.io/github/q-posev/aiida-qp2?branch=master)
-[![Docs status](https://readthedocs.org/projects/qp2/badge)](http://qp2.readthedocs.io/)
-[![PyPI version](https://badge.fury.io/py/qp2.svg)](https://badge.fury.io/py/qp2)
+[![Docs status](https://readthedocs.org/projects/aiida-qp2/badge)](http://aiida-qp2.readthedocs.io/)
+[![PyPI version](https://badge.fury.io/py/aiida-qp2.svg)](https://badge.fury.io/py/aiida-qp2)
 
-# qp2
+# aiida-qp2
 
 AiiDA plugin for the Quanum Package 2.0
 
@@ -72,7 +72,7 @@ For more information, see the [developer guide](https://aiida-qp2.readthedocs.io
 ## Installation
 
 ```shell
-pip install qp2
+pip install aiida-qp2
 verdi quicksetup  # better to set up a new profile
 verdi plugin list aiida.calculations  # should now show your calclulation plugins
 ```
@@ -106,7 +106,7 @@ pre-commit install  # install pre-commit hooks
 pytest -v  # discover and run all tests
 ```
 
-See the [developer guide](http://qp2.readthedocs.io/en/latest/developer_guide/index.html) for more information.
+See the [developer guide](http://aiida-qp2.readthedocs.io/en/latest/developer_guide/index.html) for more information.
 
 ## License
 
