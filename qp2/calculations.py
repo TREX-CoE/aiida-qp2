@@ -59,7 +59,7 @@ class QpCalculation(CalcJob):
         spec.input('metadata.options.output_filename', valid_type=str, default='aiida-qp2.out')
         # `output_ezfio_basename` and `computer` options required to store the output EZFIO tar.gz file as RemoteData node
         spec.input('metadata.options.output_ezfio_basename', valid_type=str, required=True, default='aiida.ezfio')
-        spec.input('metadata.options.computer', valid_type=str, required=True, default='localhost')
+        spec.input('metadata.options.computer', valid_type=str, required=True, default='tutor')
 
         spec.input('metadata.options.withmpi', valid_type=bool, default=False)
         spec.inputs['metadata']['options']['resources'].default = {
@@ -130,7 +130,7 @@ class QpCalculation(CalcJob):
 
         if 'basissets' in self.inputs:
             #validate_basissets(inp, self.inputs.basissets, self.inputs.structure if 'structure' in self.inputs else None)
-            with open(folder.get_abs_path(self._BASIS_FILE), 'w') as fhandle:
+            with open(folder.get_abs_path(self._BASIS_FILE), 'w', encoding='utf-8') as fhandle:
                 for elem in self.inputs.basissets.keys():
                     elem_name = Element(elem).long_name
                     fhandle.write(f'{elem_name.upper()}\n')
@@ -140,7 +140,7 @@ class QpCalculation(CalcJob):
 
         if 'pseudos' in self.inputs:
             #validate_pseudos(inp, self.inputs.pseudos, self.inputs.structure if 'structure' in self.inputs else None)
-            with open(folder.get_abs_path(self._PSEUDO), 'w') as fhandle:
+            with open(folder.get_abs_path(self._PSEUDO), 'w', encoding='utf-8') as fhandle:
                 for elem in self.inputs.pseudos.keys():
                     elem_name = Element(elem).long_name
                     fhandle.write(f'{elem_name.upper()}\n')
@@ -173,7 +173,7 @@ class QpCalculation(CalcJob):
             )
 
 
-        with open(folder.get_abs_path(self._INPUT_FILE), 'w') as inp_file:
+        with open(folder.get_abs_path(self._INPUT_FILE), 'w', encoding='utf-8') as inp_file:
             inp_file.write(input_string)
 
         return calcinfo
@@ -231,11 +231,12 @@ class QpCalculation(CalcJob):
         else:
             input_list.append(create_ezfio_command)
 
+        # run append commands of qmcchem before archiving
+        input_list.append('\n'.join(append_commands))
         # ALWAYS tar resulting EZFIO folder to be stored as an output node in the data provenance
         input_list.append(f'mv {ezfio_name} {ezfio_name}_{uuid_suffix_short}')
         input_list.append(f'tar -zcf {ezfio_name}_{uuid_suffix_short}.tar.gz {ezfio_name}_{uuid_suffix_short}')
         input_list.append(f'rm -rf -- {ezfio_name}_{uuid_suffix_short} {ezfio_name}.tar.gz')
-        input_list.append('\n'.join(append_commands))
 
         return '\n'.join(input_list)
 
