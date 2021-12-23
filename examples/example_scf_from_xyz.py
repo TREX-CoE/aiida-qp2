@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Run a 2-step test calculation on localhost.
+"""Run a 2-step test QP calculation.
 
 Usage:
-  (1) ./example_02.py
-  (2) verdi run example_02.py
+  (1) ./example_scf_fromXYZ.py
+  (2) verdi run example_scf_fromXYZ.py
 """
 from os import path
 from pymatgen.core import Molecule
@@ -13,27 +13,29 @@ from aiida import orm, engine, cmdline
 from aiida.common.exceptions import NotExistent
 
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
+XYZ_FILE = 'hcn.xyz'
+EZFIO_NAME = XYZ_FILE.replace('.xyz', '.ezfio')
+COMP_NAME = 'tutor'
 
 
 def load_aiida_setup():
-    """Load localhost computer and qp2@localhost from the AiiDA database.
-
+    """Load computer and qp2@computer from the AiiDA database.
     """
     #try:
     #    aiida_profile = load_profile(profile)
     #except:
     #    raise Exception('Create the profile for this example') from NotExistent
 
-    # Load the localhost computer
+    # Load the computer
     try:
-        computer = orm.load_computer('localhost')
+        computer = orm.load_computer(f'{COMP_NAME}')
     except:
-        raise Exception(
-            'Create the localhost computer for this example') from NotExistent
+        raise Exception(f'Create the computer {COMP_NAME} for this example'
+                        ) from NotExistent
 
     # Create or load the qp2 code
     try:
-        code = orm.load_code('qp2@localhost')
+        code = orm.load_code(f'qp2@{COMP_NAME}')
     except NotExistent:
         # Setting up code via python API (or use "verdi code setup")
         code = orm.Code(label='qp2',
@@ -45,8 +47,6 @@ def load_aiida_setup():
 
 def test_run_create_ezfio(code, computer):
     """Run JOB #1: create an EZFIO database from XYZ file
-
-    Runs on the localhost computer using qp2@localhost code
     """
     # Set up inputs
     builder = code.get_builder()
@@ -56,23 +56,22 @@ def test_run_create_ezfio(code, computer):
         'qp_create_ezfio': {
             'basis': '"6-31g"',
             'charge': '0',
-            'output': 'hcn.ezfio',
+            'output': EZFIO_NAME,
         },
-        'xyz': 'hcn.xyz',
-        'ezfio_name': 'hcn.ezfio'
+        'xyz': XYZ_FILE,
+        'ezfio_name': EZFIO_NAME
     }
 
     builder.metadata.options.output_filename = 'qp.out'
-    builder.metadata.options.output_ezfio_basename = 'hcn.ezfio'
-    builder.metadata.options.computer = 'localhost'
+    builder.metadata.options.output_ezfio_basename = create_parameters[
+        'ezfio_name']
+    builder.metadata.options.computer = computer.label
 
     # ============== CREATE_EZFIO SPECIFIC PARAMETERS =========== #
     # QP run to create EZFIO database from the XYZ file
-    mol = Molecule.from_file(path.join(INPUT_DIR, 'hcn.xyz'))
+    mol = Molecule.from_file(path.join(INPUT_DIR, XYZ_FILE))
     #print(mol)
-
     structure = orm.StructureData(pymatgen_molecule=mol)
-
     # uncomment to see how Molecule->StructureData conversion modifies the atomic positions
     #mol2 = structure.get_pymatgen_molecule()
     #print(mol2)
@@ -108,16 +107,9 @@ def test_run_create_ezfio(code, computer):
 
 def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
     """Run JOB #2: SCF calculation on the existing EZFIO database from JOB #1
-
-    Runs on the localhost computer using qp2@localhost code
     """
     builder_scf = code.get_builder()
     #ezfio_name = 'hcn.ezfio'
-
-    prepend_commands = []
-    # proper use of calcinfo.remote_copy_list allows to avoid manually copying
-    # the ezfio files on remote machines from the previous job directory to the current one
-    #prepend_commands = [f'cp {path_to_ezfio} .']
 
     path_to_ezfio = ezfio_RemoteData_inp.get_remote_path()
     ezfio_full_name = path_to_ezfio.split('/')[-1]
@@ -128,7 +120,6 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
     # COMPILE THE DICTIONARY OF QP2 PARAMETERS
     qp2_parameters = {
         'ezfio_name': ezfio_inp_name,
-        'qp_prepend': prepend_commands,
         'qp_commands': qp2_commands
     }
 
@@ -138,7 +129,7 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
 
     builder_scf.metadata.options.output_filename = 'qp.out'
     builder_scf.metadata.options.output_ezfio_basename = ezfio_inp_name
-    builder_scf.metadata.options.computer = 'localhost'
+    builder_scf.metadata.options.computer = computer.label
 
     builder_scf.code = code
     builder_scf.metadata.description = 'Test job submission with the aiida_qp2 plugin to run SCF calculations'
@@ -168,7 +159,7 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
 @click.command()
 @cmdline.utils.decorators.with_dbenv()
 def cli():
-    """Run example_02: execute 2 jobs using QP2 code.
+    """Run example_scf_fromXYZ.py : execute 2 jobs using QP code.
 
     Job #1: create an EZFIO database from the existing XYZ (hcn.xyz) file using `qp create_ezfio [arguments]` command;
 
@@ -178,11 +169,11 @@ def cli():
 
         Output: SCF energy (AiiDA-native Float object) from the AiiDA database
 
-    Example usage: $ ./example_02.py
+    Example usage: $ ./example_scf_fromXYZ.py
 
-    Alternative:   $ verdi run example_02.py
+    Alternative:   $ verdi run example_scf_fromXYZ.py
 
-    Help: $ ./example_02.py --help
+    Help: $ ./example_scf_fromXYZ.py --help
     """
     (code, computer) = load_aiida_setup()
     ezfio_RemoteData = test_run_create_ezfio(code, computer)

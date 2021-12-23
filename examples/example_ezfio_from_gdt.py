@@ -3,8 +3,8 @@
 """Load the basis set from the database.
 
 Usage:
-  (1) ./example_03.py
-  (2) verdi run example_03.py
+  (1) ./example_createEZFIO_fromGDT.py
+  (2) verdi run example_createEZFIO_fromGDT.py
 """
 from os import path
 from pymatgen.core import Molecule
@@ -15,27 +15,28 @@ from aiida.plugins import DataFactory
 
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
 XYZ_FILE = 'hcn.xyz'
+EZFIO_NAME = XYZ_FILE.replace('.xyz', '.ezfio')
+COMP_NAME = 'tutor'
 
 
 def load_aiida_setup():
-    """Load localhost computer and qp2@localhost from the AiiDA database.
-
+    """Load computer and qp2@computer from the AiiDA database.
     """
     #try:
     #    aiida_profile = load_profile(profile)
     #except:
     #    raise Exception('Create the profile for this example') from NotExistent
 
-    # Load the localhost computer
+    # Load the computer
     try:
-        computer = orm.load_computer('localhost')
+        computer = orm.load_computer(f'{COMP_NAME}')
     except:
-        raise Exception(
-            'Create the localhost computer for this example') from NotExistent
+        raise Exception(f'Create the computer {COMP_NAME} for this example'
+                        ) from NotExistent
 
     # Create or load the qp2 code
     try:
-        code = orm.load_code('qp2@localhost')
+        code = orm.load_code(f'qp2@{COMP_NAME}')
     except NotExistent:
         # Setting up code via python API (or use "verdi code setup")
         code = orm.Code(label='qp2',
@@ -47,8 +48,6 @@ def load_aiida_setup():
 
 def test_run_create_ezfio(code, computer):
     """Run JOB #1: create an EZFIO database from XYZ file
-
-    Runs on the localhost computer using qp2@localhost code
     """
 
     # create a StructureData node for the calculation
@@ -75,22 +74,22 @@ def test_run_create_ezfio(code, computer):
     # COMPILE THE DICTIONARY OF QP2 PARAMETERS
     # at the moment the name of the basis set and ECP files is hardcoded in qp2 plugin
     # it can be also provided as one of the metadata arguments
-    ezfio_name = 'hcn.ezfio'
     create_parameters = {
         'qp_create_ezfio': {
             'basis': 'aiida-basis-set',
             'charge': '0',
-            'output': ezfio_name,
+            'output': EZFIO_NAME,
         },
-        'xyz': 'hcn.xyz',
-        'ezfio_name': ezfio_name
+        'xyz': XYZ_FILE,
+        'ezfio_name': EZFIO_NAME
     }
 
     builder.basissets = basis_dict
 
     builder.metadata.options.output_filename = 'qp.out'
-    builder.metadata.options.output_ezfio_basename = ezfio_name
-    builder.metadata.options.computer = 'localhost'
+    builder.metadata.options.output_ezfio_basename = create_parameters[
+        'ezfio_name']
+    builder.metadata.options.computer = computer.label
 
     # ============== CREATE_EZFIO SPECIFIC PARAMETERS =========== #
 
@@ -122,93 +121,28 @@ def test_run_create_ezfio(code, computer):
     print('EZFIO RemoteData object : ', ezfio_RemoteData)
     print('EZFIO RemoteData path   : ', path_to_ezfio)
 
-    return ezfio_RemoteData
-
-
-#def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
-#   """Run JOB #2: SCF calculation on the existing EZFIO database from JOB #1
-#
-#      Runs on the localhost computer using qp2@localhost code
-#   """
-#   builder_scf = code.get_builder()
-#   #ezfio_name = 'hcn.ezfio'
-#
-#   prepend_commands = []
-#   # proper use of calcinfo.remote_copy_list allows to avoid manually copying
-#   # the ezfio files on remote machines from the previous job directory to the current one
-#   #prepend_commands = [f'cp {path_to_ezfio} .']
-#
-#   path_to_ezfio = ezfio_RemoteData_inp.get_remote_path()
-#   ezfio_full_name = path_to_ezfio.split('/')[-1]
-#   ezfio_inp_name = ezfio_full_name.split('.tar.gz')[0]
-#
-#   qp2_commands = [f'set_file {ezfio_inp_name}', 'run scf']
-#
-#   # COMPILE THE DICTIONARY OF QP2 PARAMETERS
-#   qp2_parameters = {
-#       'ezfio_name': ezfio_inp_name,
-#       'qp_prepend': prepend_commands,
-#       'qp_commands': qp2_commands
-#   }
-#
-#   # conventional QP run
-#   builder_scf.parameters = orm.Dict(dict=qp2_parameters)
-#   builder_scf.ezfio = ezfio_RemoteData_inp
-#
-#   builder_scf.metadata.options.output_filename = 'qp.out'
-#   builder_scf.metadata.options.output_ezfio_basename = ezfio_inp_name
-#   builder_scf.metadata.options.computer = 'localhost'
-#
-#   builder_scf.code = code
-#   builder_scf.metadata.description = 'Test job submission with the aiida_qp2 plugin to run SCF calculations'
-#   builder_scf.metadata.computer = computer
-#
-#   print('\nQP2 run_scf execution: STARTED\n')
-#
-#   result = engine.run(builder_scf)
-#
-#   print('\nQP2 run_scf execution: FINISHED\n')
-#
-#   ezfio_RemoteData = result['output_ezfio']
-#   path_to_ezfio = ezfio_RemoteData.get_remote_path()
-#
-#   ezfio_full_name = path_to_ezfio.split('/')[-1]
-#   #ezfio_base_name = ezfio_full_name.split('.tar.gz')[0]
-#
-#   print('EZFIO RemoteData name   : ', ezfio_full_name)
-#   print('EZFIO RemoteData object : ', ezfio_RemoteData)
-#   print('EZFIO RemoteData path   : ', path_to_ezfio)
-#
-#   energy = result['output_energy']
-#
-#   return energy
+    #return ezfio_RemoteData
+    return 0
 
 
 @click.command()
 @cmdline.utils.decorators.with_dbenv()
 def cli():
-    """Run example_03: execute 2 jobs using QP2 code.
+    """Run example_createEZFIO_fromGDT: create EZFIO using GTO basis sets from aiida-gaussian-datatypes plugin
 
-    Job #1: create an EZFIO database from the existing XYZ (hcn.xyz) file using `qp create_ezfio [arguments]` command;
+    Creates an EZFIO database from the existing XYZ (hcn.xyz) file using `qp create_ezfio [arguments]` command;
 
-        Output: ezfio (AiiDA-native RemoteData object) from the AiiDA database.
+    Output: ezfio (AiiDA-native RemoteData object) from the AiiDA database.
 
-    Job #2: perform SCF calculation on the EZFIO database created in the prevous step;
+    Example usage: $ ./example_createEZFIO_fromGDT.py
 
-        Output: SCF energy (AiiDA-native Float object) from the AiiDA database
+    Alternative:   $ verdi run example_createEZFIO_fromGDT.py
 
-    Example usage: $ ./example_03.py
-
-    Alternative:   $ verdi run example_03.py
-
-    Help: $ ./example_03.py --help
+    Help: $ ./example_createEZFIO_fromGDT.py --help
     """
 
     (code, computer) = load_aiida_setup()
-    ezfio_RemoteData = test_run_create_ezfio(code, computer)
-    print(ezfio_RemoteData)
-    #energy_scf = test_run_scf_from_ezfio(code, computer, ezfio_RemoteData)
-    #print('\nOutput: SCF energy\n', float(energy_scf))
+    test_run_create_ezfio(code, computer)
 
 
 if __name__ == '__main__':

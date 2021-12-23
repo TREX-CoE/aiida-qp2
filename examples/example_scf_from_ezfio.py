@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Run a test calculation on localhost.
+"""Run a test calculation on the computer.
 
-Usage: ./example_01.py
+Usage: ./example_scf_fromEZFIO.py
 """
 from os import path
 import click
@@ -12,28 +12,31 @@ from aiida.orm import Dict, load_code, load_computer
 from aiida.common.exceptions import NotExistent
 
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
+COMP_NAME = 'tutor'
 
 
-def test_run_scf(qp2_code, computer):
-    """Run a calculation on the localhost computer.
-
+def test_run_scf(qp2_code, computer, ezfio_name):
+    """Run SCF calculation with QP code using existing EZFIO file.
     """
     if not computer:
         try:
-            computer = load_computer('localhost')
+            computer = load_computer(COMP_NAME)
         except:
             raise Exception('You forgot to provide the --computer argument'
                             ) from NotExistent
 
     if not qp2_code:
         try:
-            qp2_code = load_code('qp2@localhost')
+            qp2_code = load_code(f'qp2@{COMP_NAME}')
         except:
             raise Exception(
                 'You forgot to provide the --code argument') from NotExistent
 
+    if not ezfio_name:
+        raise Exception('You forgot to provide the --ezfio_filename argument')
+
     # Prepare input parameters
-    ezfio_name = 'hcn.ezfio'
+    # ezfio_name = 'hcn.ezfio' pass from the command line
     qp2_commands = [f'set_file {ezfio_name}', 'run scf']
 
     ezfio_tar = path.join(INPUT_DIR, f'{ezfio_name}.tar.gz')
@@ -63,17 +66,20 @@ def test_run_scf(qp2_code, computer):
 @cmdline.utils.decorators.with_dbenv()
 @cmdline.params.options.CODE()
 @cmdline.params.options.COMPUTER()
-def cli(code, computer):
-    """Run example_01: SCF calculation using QP2 on existing EZFIO database.
+@click.option('--ezfio_filename', '-e', help='EZFIO file name.')
+def cli(code, computer, ezfio_filename):
+    """Run example_scf_fromEZFIO: SCF calculation using QP2 on existing EZFIO database.
 
-    Example usage: $ ./example_01.py --code qp2@localhost --computer localhost
+    Example usage:
+    $ ./example_scf_fromEZFIO.py --code qp2@localhost --computer localhost --ezfio_filename hcn.ezfio
 
-    Alternative (loads qp2@localhost code and localhost computer): $ ./example_01.py
+    Alternative usage (loads qp2@tutor code and tutor computer):
+    $ ./example_scf_fromEZFIO.py
 
-    Help: $ ./example_01.py --help
+    Help: $ ./example_scf_fromEZFIO.py --help
     """
 
-    test_run_scf(code, computer)
+    test_run_scf(code, computer, ezfio_filename)
 
 
 if __name__ == '__main__':
