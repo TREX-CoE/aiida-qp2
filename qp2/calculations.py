@@ -106,7 +106,10 @@ class QP2Calculation(CalcJob):
         # extract the name of the wavefunction file
         wf_filename = self.inputs.wavefunction.filename if not QP_INIT else None
         # extract the base name (without .tar.gz suffix)
-        output_wf_basename = self.metadata.options.output_wf_basename if QP_INIT else wf_filename.replace('.tar.gz','')
+        output_wf_basename = self.metadata.options.output_wf_basename
+        # safety check
+        if '.tar.gz' in output_wf_basename:
+            output_wf_basename.replace('.tar.gz', '')
         # extract the name of the XYZ file for create_ezfio job
         xyz_name = parameters['xyz'] if QP_INIT else None
 
