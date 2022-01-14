@@ -13,10 +13,10 @@ from aiida.plugins import CalculationFactory
 from aiida.common import exceptions
 from aiida.orm import Float, SinglefileData
 
-QpCalculation = CalculationFactory('qp2')
+QP2Calculation = CalculationFactory('qp2')
 
 
-class QpParser(Parser):
+class QP2Parser(Parser):
     """
     Parser class for parsing output of calculation.
     """
@@ -24,14 +24,14 @@ class QpParser(Parser):
         """
         Initialize Parser instance
 
-        Checks that the ProcessNode being passed was produced by a QpCalculation.
+        Checks that the ProcessNode being passed was produced by a QP2Calculation.
 
         :param node: ProcessNode of calculation
         :param type node: :class:`aiida.orm.ProcessNode`
         """
         super().__init__(node)
-        if not issubclass(node.process_class, QpCalculation):
-            raise exceptions.ParsingError('Can only parse QpCalculation')
+        if not issubclass(node.process_class, QP2Calculation):
+            raise exceptions.ParsingError('Can only parse QP2Calculation')
 
     def parse(self, **kwargs):  # pylint: disable=too-many-locals
         """
@@ -39,7 +39,11 @@ class QpParser(Parser):
 
         :returns: an exit code, if parsing fails (or nothing if parsing succeeds)
         """
+        # The filename containing output of the QP run
         output_filename = self.node.get_option('output_filename')
+        # Get filename of the output wavefunction file (required)
+        output_wf_filename = self.node.get_option(
+            'output_wf_basename') + '.tar.gz'
 
         try:
             out_folder = self.retrieved
@@ -48,7 +52,7 @@ class QpParser(Parser):
 
         # Check that folder content is as expected
         files_retrieved = self.retrieved.list_object_names()
-        files_expected = [output_filename]
+        files_expected = [output_filename, output_wf_filename]
         # Note: set(A) <= set(B) checks whether A is a subset of B
         if not set(files_expected) <= set(files_retrieved):
             self.logger.error("Found files '{}', expected to find '{}'".format(
@@ -73,20 +77,12 @@ class QpParser(Parser):
             #else:
             #    return self.exit_codes.ERROR_MISSING_ENERGY
 
-        # The ezfio tar.gz file is the REQUIRED output of the qp2 calculation
-        # i.e. it should always be detected and stored (see below)
-
-        # Get the ezfio basename and job UUID from the input parameters
-        output_ezfio_base = self.node.get_option('output_wf_basename')
-        # Build full name and path for the output tarball
-        output_ezfio_name = f'{output_ezfio_base}.tar.gz'
-        abs_path_ezfio = path_join(
+        # build absolute path of the wavefunction file to store as SinglefileData node
+        abs_path_wf_file = path_join(
             out_folder._repository._get_base_folder().abspath,  #pylint: disable=protected-access
-            output_ezfio_name)
-
+            output_wf_filename)
         # Create a SinglefileData node corresponding to the output ezfio tarball
-        remote_ezfio = SinglefileData(abs_path_ezfio)
-        # Set the `output_ezfio` node
-        self.out('output_wavefunction', remote_ezfio)
+        wf_file = SinglefileData(abs_path_wf_file)
+        self.out('output_wavefunction', wf_file)
 
         return ExitCode(0)

@@ -3,7 +3,7 @@
     "author": "TREX-CoE",
     "author_email": "posenitskiy@irsamc.ups-tlse.fr",
     "description": "AiiDA plugin for the Quanum Package 2.0",
-    "url": "https://github.com/q-posev/aiida-qp2",
+    "url": "https://github.com/TREX-CoE/aiida-qp2",
     "license": "MIT",
     "classifiers": [
         "Programming Language :: Python",
@@ -12,16 +12,16 @@
         "Natural Language :: English",
         "Framework :: AiiDA"
     ],
-    "version": "0.1.0a",
+    "version": "0.2.0",
     "entry_points": {
         "aiida.data": [
-            "qp2 = qp2.data:QpParameters"
+            "qp2 = qp2.data:QP2Parameters"
         ],
         "aiida.calculations": [
-            "qp2 = qp2.calculations:QpCalculation"
+            "qp2 = qp2.calculations:QP2Calculation"
         ],
         "aiida.parsers": [
-            "qp2 = qp2.parsers:QpParser"
+            "qp2 = qp2.parsers:QP2Parser"
         ],
         "aiida.cmdline.data": [
             "qp2 = qp2.cli:data_cli"

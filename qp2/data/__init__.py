@@ -20,7 +20,7 @@ cmdline_options = {
 }
 
 
-class QpParameters(Dict):  # pylint: disable=too-many-ancestors
+class QP2Parameters(Dict):  # pylint: disable=too-many-ancestors
     """
     Command line options for qp2.
 
@@ -36,7 +36,7 @@ class QpParameters(Dict):  # pylint: disable=too-many-ancestors
         """
         Constructor for the data class
 
-        Usage: ``QpParameters(dict{'ignore-case': True})``
+        Usage: ``QP2Parameters(dict{'ignore-case': True})``
 
         :param parameters_dict: dictionary with commandline parameters
         :param type parameters_dict: dict
@@ -50,13 +50,13 @@ class QpParameters(Dict):  # pylint: disable=too-many-ancestors
 
         Uses the voluptuous package for validation. Find out about allowed keys using::
 
-            print(QpParameters).schema.schema
+            print(QP2Parameters).schema.schema
 
         :param parameters_dict: dictionary with commandline parameters
         :param type parameters_dict: dict
         :returns: validated dictionary
         """
-        return QpParameters.schema(parameters_dict)
+        return QP2Parameters.schema(parameters_dict)
 
     def cmdline_params(self, file1_name, file2_name):
         """Synthesize command line parameters.

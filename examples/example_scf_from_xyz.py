@@ -16,11 +16,11 @@ INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
 XYZ_FILE = 'hcn.xyz'
 EZFIO_NAME = XYZ_FILE.replace('.xyz', '.ezfio')
 
-#CODE_NAME = 'qp2_singularity'
-#COMP_NAME = 'olympe'
+CODE_NAME = 'qp2_singularity'
+COMP_NAME = 'olympe'
 
-CODE_NAME = 'qp2'
-COMP_NAME = 'tutor'
+#CODE_NAME = 'qp2'
+#COMP_NAME = 'tutor'
 
 
 def load_aiida_setup():
@@ -70,7 +70,7 @@ def test_run_create_ezfio(code, computer):
     builder.metadata.options.output_filename = 'qp.out'
     builder.metadata.options.output_wf_basename = EZFIO_NAME
 
-    builder.metadata.options.computer = computer.label
+    #builder.metadata.options.computer = computer.label
 
     # ============== CREATE_EZFIO SPECIFIC PARAMETERS =========== #
     # QP run to create EZFIO database from the XYZ file
@@ -134,7 +134,7 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
 
     builder_scf.metadata.options.output_filename = 'qp.out'
     builder_scf.metadata.options.output_wf_basename = ezfio_inp_name
-    builder_scf.metadata.options.computer = computer.label
+    #builder_scf.metadata.options.computer = computer.label
 
     builder_scf.code = code
     builder_scf.metadata.description = 'Test job submission with the aiida_qp2 plugin to run SCF calculations'
