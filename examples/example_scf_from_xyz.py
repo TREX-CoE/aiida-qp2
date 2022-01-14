@@ -15,11 +15,16 @@ from aiida.common.exceptions import NotExistent
 INPUT_DIR = path.join(path.dirname(path.realpath(__file__)), 'input_files')
 XYZ_FILE = 'hcn.xyz'
 EZFIO_NAME = XYZ_FILE.replace('.xyz', '.ezfio')
+
+#CODE_NAME = 'qp2_singularity'
+#COMP_NAME = 'olympe'
+
+CODE_NAME = 'qp2'
 COMP_NAME = 'tutor'
 
 
 def load_aiida_setup():
-    """Load computer and qp2@computer from the AiiDA database.
+    """Load computer and code from the AiiDA database.
     """
     #try:
     #    aiida_profile = load_profile(profile)
@@ -35,12 +40,11 @@ def load_aiida_setup():
 
     # Create or load the qp2 code
     try:
-        code = orm.load_code(f'qp2@{COMP_NAME}')
+        code = orm.load_code(f'{CODE_NAME}@{COMP_NAME}')
     except NotExistent:
         # Setting up code via python API (or use "verdi code setup")
-        code = orm.Code(label='qp2',
-                        remote_computer_exec=[computer, '~/qp2/bin/qpsh'],
-                        input_plugin_name='qp2')
+        raise Exception(
+            'Create the qp2 code for this example') from NotExistent
 
     return (code, computer)
 
@@ -54,17 +58,18 @@ def test_run_create_ezfio(code, computer):
     # COMPILE THE DICTIONARY OF QP2 PARAMETERS
     create_parameters = {
         'qp_create_ezfio': {
-            'basis': '"6-31g"',
+            #'basis': '"6-31g"',
+            'basis': '"aug-cc-pvtz"',
             'charge': '0',
             'output': EZFIO_NAME,
         },
         'xyz': XYZ_FILE,
-        'ezfio_name': EZFIO_NAME
+        'wf_basename': EZFIO_NAME
     }
 
     builder.metadata.options.output_filename = 'qp.out'
-    builder.metadata.options.output_ezfio_basename = create_parameters[
-        'ezfio_name']
+    builder.metadata.options.output_wf_basename = EZFIO_NAME
+
     builder.metadata.options.computer = computer.label
 
     # ============== CREATE_EZFIO SPECIFIC PARAMETERS =========== #
@@ -91,16 +96,16 @@ def test_run_create_ezfio(code, computer):
 
     print('\nQP2 create_ezfio execution: FINISHED\n')
 
-    ezfio_RemoteData = result['output_ezfio']
-    path_to_ezfio = ezfio_RemoteData.get_remote_path()
+    ezfio_RemoteData = result['output_wavefunction']
+    #path_to_ezfio = ezfio_RemoteData.get_remote_path()
     #computer_with_ezfio = ezfio_RemoteData.get_computer_name()
 
-    ezfio_full_name = path_to_ezfio.split('/')[-1]
+    ezfio_full_name = ezfio_RemoteData.filename
+    #path_to_ezfio.split('/')[-1]
     #ezfio_base_name = ezfio_full_name.split('.tar.gz')[0]
 
     print('EZFIO RemoteData name   : ', ezfio_full_name)
     print('EZFIO RemoteData object : ', ezfio_RemoteData)
-    print('EZFIO RemoteData path   : ', path_to_ezfio)
 
     return ezfio_RemoteData
 
@@ -111,24 +116,24 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
     builder_scf = code.get_builder()
     #ezfio_name = 'hcn.ezfio'
 
-    path_to_ezfio = ezfio_RemoteData_inp.get_remote_path()
-    ezfio_full_name = path_to_ezfio.split('/')[-1]
+    #path_to_ezfio = ezfio_RemoteData_inp.get_remote_path()
+    ezfio_full_name = ezfio_RemoteData_inp.filename
     ezfio_inp_name = ezfio_full_name.split('.tar.gz')[0]
 
     qp2_commands = [f'set_file {ezfio_inp_name}', 'run scf']
 
     # COMPILE THE DICTIONARY OF QP2 PARAMETERS
     qp2_parameters = {
-        'ezfio_name': ezfio_inp_name,
+        'wf_basename': ezfio_inp_name,
         'qp_commands': qp2_commands
     }
 
     # conventional QP run
     builder_scf.parameters = orm.Dict(dict=qp2_parameters)
-    builder_scf.ezfio = ezfio_RemoteData_inp
+    builder_scf.wavefunction = ezfio_RemoteData_inp
 
     builder_scf.metadata.options.output_filename = 'qp.out'
-    builder_scf.metadata.options.output_ezfio_basename = ezfio_inp_name
+    builder_scf.metadata.options.output_wf_basename = ezfio_inp_name
     builder_scf.metadata.options.computer = computer.label
 
     builder_scf.code = code
@@ -141,15 +146,13 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
 
     print('\nQP2 run_scf execution: FINISHED\n')
 
-    ezfio_RemoteData = result['output_ezfio']
-    path_to_ezfio = ezfio_RemoteData.get_remote_path()
+    ezfio_RemoteData = result['output_wavefunction']
 
-    ezfio_full_name = path_to_ezfio.split('/')[-1]
+    ezfio_full_name = ezfio_RemoteData.filename
     #ezfio_base_name = ezfio_full_name.split('.tar.gz')[0]
 
     print('EZFIO RemoteData name   : ', ezfio_full_name)
     print('EZFIO RemoteData object : ', ezfio_RemoteData)
-    print('EZFIO RemoteData path   : ', path_to_ezfio)
 
     energy = result['output_energy']
 
@@ -177,8 +180,8 @@ def cli():
     """
     (code, computer) = load_aiida_setup()
     ezfio_RemoteData = test_run_create_ezfio(code, computer)
-    energy_scf = test_run_scf_from_ezfio(code, computer, ezfio_RemoteData)
 
+    energy_scf = test_run_scf_from_ezfio(code, computer, ezfio_RemoteData)
     print('\nOutput: SCF energy\n', float(energy_scf))
 
 

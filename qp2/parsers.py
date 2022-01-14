@@ -11,8 +11,7 @@ from aiida.engine import ExitCode
 from aiida.parsers.parser import Parser
 from aiida.plugins import CalculationFactory
 from aiida.common import exceptions
-from aiida.orm import Float, RemoteData
-from aiida.orm import load_computer
+from aiida.orm import Float, SinglefileData
 
 QpCalculation = CalculationFactory('qp2')
 
@@ -78,21 +77,16 @@ class QpParser(Parser):
         # i.e. it should always be detected and stored (see below)
 
         # Get the ezfio basename and job UUID from the input parameters
-        output_ezfio_base = self.node.get_option('output_ezfio_basename')
-        uuid = self.node.uuid  #pylint: disable=protected-access
-        short_uuid = uuid[:8]  #pylint: disable=protected-access
-        # Build full name and path for the output ezfio tarball
-        output_ezfio_name = f'{output_ezfio_base}_{short_uuid}.tar.gz'
+        output_ezfio_base = self.node.get_option('output_wf_basename')
+        # Build full name and path for the output tarball
+        output_ezfio_name = f'{output_ezfio_base}.tar.gz'
         abs_path_ezfio = path_join(
             out_folder._repository._get_base_folder().abspath,  #pylint: disable=protected-access
             output_ezfio_name)
-        # Get the remote computer name and load the computer (required for RemoteData output node)
-        computer_label = self.node.get_option('computer')
-        remote_computer = load_computer(label=computer_label)
-        # Create a RemoteData node corresponding to the output ezfio tarball
-        remote_ezfio = RemoteData(remote_path=abs_path_ezfio,
-                                  computer=remote_computer)
+
+        # Create a SinglefileData node corresponding to the output ezfio tarball
+        remote_ezfio = SinglefileData(abs_path_ezfio)
         # Set the `output_ezfio` node
-        self.out('output_ezfio', remote_ezfio)
+        self.out('output_wavefunction', remote_ezfio)
 
         return ExitCode(0)

@@ -10,7 +10,7 @@ from collections.abc import Sequence
 
 from aiida.common import CalcInfo, CodeInfo
 from aiida.engine import CalcJob
-from aiida.orm import Dict, Float, Code, StructureData, RemoteData
+from aiida.orm import Dict, Float, Code, StructureData, SinglefileData
 from aiida.plugins import DataFactory
 from pymatgen.core.periodic_table import Element
 
@@ -36,7 +36,8 @@ class QpCalculation(CalcJob):
         spec.input('parameters', valid_type=Dict, required=True, help='Input parameters to generate the input file.')
         # current keys: qp_create_ezfio, qp_commands, qp_prepend, qp_append, ezfio_name
         spec.input('structure', valid_type=StructureData, required=False, help='Input structrue')
-        spec.input('ezfio', valid_type=RemoteData, required=False, help='The EZFIO database (without .tar.gz).')
+        #spec.input('ezfio', valid_type=RemoteData, required=False, help='The EZFIO database (without .tar.gz).')
+        spec.input('wavefunction', valid_type=SinglefileData, required=False, help='The wf_file (EZFIO or TREXIO).')
         spec.input('settings', valid_type=Dict, required=False, help='Additional input parameters.')
         spec.input('code', valid_type=Code, required=False, help='The `Code` to use for this job.')
 
@@ -58,7 +59,7 @@ class QpCalculation(CalcJob):
 
         spec.input('metadata.options.output_filename', valid_type=str, default='aiida-qp2.out')
         # `output_ezfio_basename` and `computer` options required to store the output EZFIO tar.gz file as RemoteData node
-        spec.input('metadata.options.output_ezfio_basename', valid_type=str, required=True, default='aiida.ezfio')
+        spec.input('metadata.options.output_wf_basename', valid_type=str, required=True, default='aiida.ezfio')
         spec.input('metadata.options.computer', valid_type=str, required=True, default='tutor')
 
         spec.input('metadata.options.withmpi', valid_type=bool, default=False)
@@ -73,8 +74,10 @@ class QpCalculation(CalcJob):
         spec.output_node = 'output_energy'
         #spec.output('output_parameters', valid_type=Dict, required=True, help='The results of the calculation')
         #spec.output_node = 'output_parameters'
-        spec.output('output_ezfio', valid_type=RemoteData, required=True, help='The wave function file (EZFIO tar.gz)')
-        spec.output_node = 'output_ezfio'
+        #spec.output('output_ezfio', valid_type=RemoteData, required=True, help='The wave function file (EZFIO tar.gz)')
+        spec.output('output_wavefunction', valid_type=SinglefileData, required=True,
+                    help='The wave function file (EZFIO or TREXIO)')
+        spec.output_node = 'output_wavefunction'
 
         spec.exit_code(100, 'ERROR_NO_RETRIEVED_FOLDER', message='The retrieved folder data node could not be accessed.')
         spec.exit_code(300, 'ERROR_MISSING_OUTPUT_FILES', message='Calculation did not produce all expected output files.')
@@ -93,9 +96,16 @@ class QpCalculation(CalcJob):
         settings = self.inputs.settings.get_dict() if 'settings' in self.inputs else {}
         parameters = self.inputs.parameters.get_dict()
         # extract the name of the ezfio database
-        ezfio_name = parameters['ezfio_name'] if 'ezfio_name' in parameters.keys() else None
+        #ezfio_name = parameters['ezfio_name'] if 'ezfio_name' in parameters.keys() else None
+
+        wf_filename = self.inputs.wavefunction.filename if 'wavefunction' in self.inputs.keys() else None
+        print(wf_filename)
+
+        output_wf_basename = self.metadata.options.output_wf_basename
+        print(output_wf_basename)
+
         # extract the first 8 symbols of uuid to be appended to the output ezfio tarball
-        uuid_suffix_short = self.uuid[:8]
+        #uuid_suffix_short = self.uuid[:8]
         # extract the name of the XYZ file for create_ezfio
         xyz_name = parameters['xyz'] if 'xyz' in parameters.keys() else None
 
@@ -120,12 +130,16 @@ class QpCalculation(CalcJob):
         # and now you want to launch a second one, that requires some of the output files of the first run as its inputs.
         # TODO current procedure relies on copying the EZFIO tar.gz to the local repository where AiiDA runs # pylint: disable=fixme
         # TODO perhaps this can be avoided by providing a path on the remote machine instead of the local one # pylint: disable=fixme
-        if 'ezfio' in self.inputs.keys():
-            calcinfo.remote_copy_list = [
-                (self.inputs.metadata.computer.uuid, self.inputs.ezfio.get_remote_path(), './')
-                ] if not 'xyz' in parameters.keys() else []
+        if 'wavefunction' in self.inputs.keys():
+            #calcinfo.remote_copy_list = [
+            #    (self.inputs.metadata.computer.uuid, self.inputs.wavefunction.get_remote_path(), './')
+            #    ] if not 'xyz' in parameters.keys() else []
+            calcinfo.local_copy_list = [
+                    (self.inputs.wavefunction.uuid, wf_filename, wf_filename)
+                    ] if not 'xyz' in parameters.keys() else []
         else:
-            calcinfo.remote_copy_list = []
+            calcinfo.local_copy_list = []
+            #calcinfo.remote_copy_list = []
 
 
         if 'basissets' in self.inputs:
@@ -155,7 +169,8 @@ class QpCalculation(CalcJob):
         # TODO test-aiida/work/{AIIDA_IDs} to ~/.aiida/repository/posev-ubuntu/repository/node/... # pylint: disable=fixme
         # TODO this can probably be avoided by allowing AiiDA to operate entirely on remote computer # pylint: disable=fixme
         # TODO instead of copying to the local machine (where AiiDA runs) # pylint: disable=fixme
-        calcinfo.retrieve_list.append(f'./{ezfio_name}_{uuid_suffix_short}.tar.gz')
+        calcinfo.retrieve_list.append(f'{self.metadata.options.output_wf_basename}.tar.gz')
+        #(f'{ezfio_name}_{uuid_suffix_short}.tar.gz')
 
         inp_structure = None
         if 'structure' in self.inputs:
@@ -169,7 +184,7 @@ class QpCalculation(CalcJob):
 
 
         input_string = QpCalculation._render_input_string_from_params(
-            parameters, inp_structure, uuid_suffix_short
+            parameters, output_wf_basename, inp_structure
             )
 
 
@@ -180,13 +195,14 @@ class QpCalculation(CalcJob):
 
 
     @classmethod
-    def _render_input_string_from_params(cls, parameters, structure, uuid_suffix_short):
+    def _render_input_string_from_params(cls, parameters, wf_basename, structure):
         """
         Generate the QP submission file based on the contents of the input `parameters` dictionary.
         """
 
         # Extract the name of the ezfio database
-        ezfio_name = parameters['ezfio_name'] if 'ezfio_name' in parameters.keys() else None
+        #ezfio_name = parameters['ezfio_name'] if 'ezfio_name' in parameters.keys() else None
+        wf_filename = f'{wf_basename}.tar.gz'
         # Extract the list of commands to be executed before the Quantum Package
         prepend_commands = parameters['qp_prepend'] if 'qp_prepend' in parameters.keys() else []
         # Extract the list of command line options for create_ezfio
@@ -225,7 +241,8 @@ class QpCalculation(CalcJob):
 
         # OPTIONAL build a block of QP commands to be executed consequently (e.g. qp set_file, qp set, qp run)
         if structure is None:
-            input_list.append(f'tar -zxf {ezfio_name}.tar.gz')
+            input_list.append(f'tar -zxf {wf_filename}')
+            input_list.append(f'rm -- {wf_filename}')
             input_list.append('\n'.join(qp_commands))
         # OPTIONAL create EZFIO database otherwise (in case StructureData is provided)
         else:
@@ -234,9 +251,8 @@ class QpCalculation(CalcJob):
         # run append commands of qmcchem before archiving
         input_list.append('\n'.join(append_commands))
         # ALWAYS tar resulting EZFIO folder to be stored as an output node in the data provenance
-        input_list.append(f'mv {ezfio_name} {ezfio_name}_{uuid_suffix_short}')
-        input_list.append(f'tar -zcf {ezfio_name}_{uuid_suffix_short}.tar.gz {ezfio_name}_{uuid_suffix_short}')
-        input_list.append(f'rm -rf -- {ezfio_name}_{uuid_suffix_short} {ezfio_name}.tar.gz')
+        input_list.append(f'tar -zcf {wf_filename} {wf_basename}')
+        input_list.append(f'rm -rf -- {wf_basename}/ ')
 
         return '\n'.join(input_list)
 
