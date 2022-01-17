@@ -10,7 +10,7 @@ from collections.abc import Sequence
 
 from aiida.common import CalcInfo, CodeInfo
 from aiida.engine import CalcJob
-from aiida.orm import Dict, Float, Code, StructureData, SinglefileData
+from aiida.orm import Dict, Float, Code, Str, StructureData, SinglefileData
 from aiida.plugins import DataFactory
 from pymatgen.core.periodic_table import Element
 
@@ -33,12 +33,22 @@ class QP2Calculation(CalcJob):
         super().define(spec)
 
         # Set default values for AiiDA options
-        spec.input('parameters', valid_type=Dict, required=True, help='Input parameters to generate the input file.')
-        # current keys: qp_create_ezfio, qp_commands, qp_prepend, qp_append
+
+        # Dictionary of parameters, supported: qp_create_ezfio, qp_commands, qp_prepend, qp_append
+        spec.input('parameters', valid_type=Dict, required=True,
+                help='Input parameters to generate the input file.')
+
         spec.input('structure', valid_type=StructureData, required=False, help='Input structrue')
+
         spec.input('wavefunction', valid_type=SinglefileData, required=False, help='The wavefunction file (EZFIO or TREXIO).')
+
         spec.input('settings', valid_type=Dict, required=False, help='Additional input parameters.')
+
         spec.input('code', valid_type=Code, required=False, help='The `Code` to use for this job.')
+
+        # Output wavefunction base name
+        spec.input('metadata.options.output_wf_basename', valid_type=str, required=True, default='aiida.wf',
+                help='Base name of the output wavefunction file (without .tar.gz or .h5).')
 
         spec.input_namespace(
             'basissets',
@@ -57,7 +67,6 @@ class QP2Calculation(CalcJob):
                   ' value is a single pseudopotential.'))
 
         spec.input('metadata.options.output_filename', valid_type=str, default='aiida-qp2.out')
-        spec.input('metadata.options.output_wf_basename', valid_type=str, required=True, default='aiida.ezfio')
 
         spec.inputs['metadata']['options']['parser_name'].default = 'qp2'
 
@@ -105,6 +114,7 @@ class QP2Calculation(CalcJob):
 
         # extract the name of the wavefunction file
         wf_filename = self.inputs.wavefunction.filename if not QP_INIT else None
+        input_wf_basename = wf_filename.replace('.tar.gz','') if wf_filename else None
         # extract the base name (without .tar.gz suffix)
         output_wf_basename = self.metadata.options.output_wf_basename
         # safety check
@@ -160,7 +170,7 @@ class QP2Calculation(CalcJob):
 
         # retrieve_list will copy the files from the remote machine to the local one (where AiiDA runs)
         calcinfo.retrieve_list = [self.metadata.options.output_filename]
-        calcinfo.retrieve_list.append(f'{self.metadata.options.output_wf_basename}.tar.gz')
+        calcinfo.retrieve_list.append(f'{output_wf_basename}.tar.gz')
 
         inp_structure = None
         if 'structure' in self.inputs:
@@ -173,7 +183,7 @@ class QP2Calculation(CalcJob):
             inp_structure.to(filename=folder.get_abs_path(self._INPUT_COORDS_FILE), fmt='xyz')
 
         input_string = QP2Calculation._render_input_string_from_params(
-            parameters, output_wf_basename
+            parameters, input_wf_basename, output_wf_basename
             )
 
         with open(folder.get_abs_path(self._INPUT_FILE), 'w', encoding='utf-8') as inp_file:
@@ -183,7 +193,7 @@ class QP2Calculation(CalcJob):
 
 
     @classmethod
-    def _render_input_string_from_params(cls, parameters, wf_basename):
+    def _render_input_string_from_params(cls, parameters, input_wf_basename, output_wf_basename):
         """ Generate the QP submission file based on the contents of the input `parameters` dictionary.
         """
 
@@ -196,8 +206,6 @@ class QP2Calculation(CalcJob):
         else:
             QP_INIT = False
 
-        # Extract the name of the ezfio database
-        wf_filename = f'{wf_basename}.tar.gz'
         # Extract the list of commands to be executed before the Quantum Package
         prepend_commands = parameters['qp_prepend'] if 'qp_prepend' in parameters.keys() else []
         # Extract the list of QP-specific commands to be executed
@@ -236,8 +244,8 @@ class QP2Calculation(CalcJob):
             input_list.append(create_ezfio_command)
         else:
             # extract the provided wavefunction file
-            input_list.append(f'tar -zxf {wf_filename}')
-            input_list.append(f'rm -- {wf_filename}')
+            input_list.append(f'tar -zxf {input_wf_basename}.tar.gz')
+            input_list.append(f'rm -- {input_wf_basename}.tar.gz')
 
 
         # build a block of QP commands to be executed consequently (e.g. qp set_file, qp set, qp run)
@@ -248,8 +256,11 @@ class QP2Calculation(CalcJob):
         input_list.append('\n'.join(append_commands))
 
         # ALWAYS tar the final wavefunction file to be stored in the data provenance
-        input_list.append(f'tar -zcf {wf_filename} {wf_basename}')
-        input_list.append(f'rm -rf -- {wf_basename}/ ')
+        input_list.append(f'tar -zcf {output_wf_basename}.tar.gz {output_wf_basename}')
+        input_list.append(f'rm -rf -- {output_wf_basename}/')
+        # 2 directories can be produced when exporting to TREXIO, so clean both
+        if (not input_wf_basename is None) and (not output_wf_basename in input_wf_basename):
+            input_list.append(f'rm -rf -- {input_wf_basename}/')
 
         return '\n'.join(input_list)
 
