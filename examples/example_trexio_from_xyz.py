@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Run a 2-step test QP calculation.
+"""Run a 3-step test QP calculation.
 
 Usage:
-  (1) ./example_scf_fromXYZ.py
-  (2) verdi run example_scf_fromXYZ.py
+  (1) ./example_trexio_from_xyz.py
+  (2) verdi run example_trexio_from_xyz.py
 """
+
 from os import path
 from pymatgen.core import Molecule
 import click
@@ -106,10 +107,38 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
     ezfio_full_name = ezfio_RemoteData_inp.filename
     ezfio_inp_name = ezfio_full_name.replace('.tar.gz', '')
 
-    # COMPILE THE DICTIONARY OF QP2 PARAMETERS
+    # COMPILE THE DICTIONARY OF QP2 PARAMETERS FOR PURE QP RUN
+
     qp_commands = [f'set_file {ezfio_inp_name}', 'run scf']
 
     qp_parameters = {'qp_commands': qp_commands}
+
+    # --------------- TO RUN QMC=CHEM INSTEAD --------------- #
+
+    # to run qmcchem after the QP 2
+    #qp_commands = [
+    #        f'set_file {ezfio_inp_name}',
+    #        'run scf',
+    #        'run save_for_qmcchem'
+    #        ]
+
+    #qmcchem_commands = [
+    #    'source ~/qmcchem/qmcchemrc',
+    #    f'qmcchem edit --block-time=10 --stop-time=60 {ezfio_inp_name}',
+    #    f'qmcchem run {ezfio_inp_name}',
+    #    f'qmcchem result -e E_loc {ezfio_inp_name}' +
+    #    """ | tail -1 | awk '{printf  $2 "  " $3 "\n"}' """
+    #]
+
+    # COMPILE THE DICTIONARY OF QP2 PARAMETERS
+    #qp_parameters = {
+    #    'ezfio_name': ezfio_inp_name,
+    #    'qp_prepend': prepend_commands,
+    #    'qp_commands': qp_commands,
+    #    'qp_append': qmcchem_commands
+    #}
+
+    # --------------- QMC=CHEM SECTION --------------- #
 
     # conventional QP run
     builder_scf.parameters = orm.Dict(dict=qp_parameters)
@@ -139,8 +168,8 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
     return (energy, ezfio_RemoteData)
 
 
-def export_trexio(code, computer, wf_inp):
-    """Run JOB #3: Export TREXIO from existing EZFIO database.
+def test_export_trexio(code, computer, wf_inp):
+    """Run JOB #3: export TREXIO file from the existing EZFIO database.
     """
     builder_scf = code.get_builder()
 
@@ -185,21 +214,25 @@ def export_trexio(code, computer, wf_inp):
 @click.command()
 @cmdline.utils.decorators.with_dbenv()
 def cli():
-    """Run example_scf_fromXYZ.py : execute 2 jobs using QP code.
+    """Run example_trexio_from_xyz.py : execute 3 jobs using QP code.
 
     Job #1: create an EZFIO database from the existing XYZ (hcn.xyz) file using `qp create_ezfio [arguments]` command;
 
-        Output: ezfio (AiiDA-native RemoteData object) from the AiiDA database.
+        Output: EZFIO wavefunction (AiiDA-native SinglefileData object) from the AiiDA database.
 
     Job #2: perform SCF calculation on the EZFIO database created in the prevous step;
 
-        Output: SCF energy (AiiDA-native Float object) from the AiiDA database
+        Output:
+        1. SCF energy (AiiDA-native Float object) from the AiiDA database;
+        2. EZFIO wavefunction (AiiDA-native SinglefileData object).
 
-    Example usage: $ ./example_scf_fromXYZ.py
+    Job #3: export TREXIO wavefunction file using EZFIO from the previous step;
 
-    Alternative:   $ verdi run example_scf_fromXYZ.py
+        Output: TREXIO wavefunction (AiiDA-native SinglefileData object).
 
-    Help: $ ./example_scf_fromXYZ.py --help
+    Run:  $ verdi run example_trexio_from_xyz.py
+
+    Help: $ ./example_trexio_from_xyz.py --help
     """
     (code, computer) = load_aiida_setup()
     wf1 = test_run_create_ezfio(code, computer)
@@ -207,7 +240,7 @@ def cli():
     energy_scf, wf2 = test_run_scf_from_ezfio(code, computer, wf1)
     print('\nOutput: SCF energy\n', float(energy_scf))
 
-    export_trexio(code, computer, wf2)
+    test_export_trexio(code, computer, wf2)
 
 
 if __name__ == '__main__':
