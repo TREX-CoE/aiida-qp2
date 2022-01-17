@@ -17,10 +17,10 @@ intended to help developers get started with their AiiDA plugins.
   * [`ci.yml`](.github/workflows/ci.yml): runs tests, checks test coverage and builds documentation at every new commit
   * [`publish-on-pypi.yml`](.github/workflows/publish-on-pypi.yml): automatically deploy git tags to PyPI - just generate a [PyPI API token](https://pypi.org/help/#apitoken) for your PyPI account and add it to the `pypi_token` secret of your github repository
 * [`qp2/`](qp2/): The main source code of the plugin package
-  * [`data/`](qp2/data/): A new `QpParameters` data class, used as input to the `QpCalculation` `CalcJob` class
-  * [`calculations.py`](qp2/calculations.py): A new `QpCalculation` `CalcJob` class
-  * [`cli.py`](qp2/cli.py): Extensions of the `verdi data` command line interface for the `QpParameters` class
-  * [`parsers.py`](qp2/parsers.py): A new `Parser` for the `QpCalculation`
+  * [`data/`](qp2/data/): A new `QP2Parameters` data class, used as input to the `QP2Calculation` `CalcJob` class
+  * [`calculations.py`](qp2/calculations.py): A new `QP2Calculation` `CalcJob` class
+  * [`cli.py`](qp2/cli.py): Extensions of the `verdi data` command line interface for the `QP2Parameters` class
+  * [`parsers.py`](qp2/parsers.py): A new `Parser` for the `QP2Calculation`
 * [`docs/`](docs/): A documentation template ready for publication on [Read the Docs](http://aiida-qp2.readthedocs.io/en/latest/)
 * [`examples/`](examples/): Examples of how to submit a calculation using this plugin
 * [`tests/`](tests/): Basic regression tests using the [pytest](https://docs.pytest.org/en/latest/) framework (submitting a calculation, ...). Install `pip install -e .[testing]` and run `pytest`.
@@ -62,11 +62,11 @@ For more information, see the [developer guide](https://aiida-qp2.readthedocs.io
    inputs['file2'] = SinglefileData(file='/path/to/file2')
    ```
 
- * Specify command line options via a python dictionary and `QpParameters`:
+ * Specify command line options via a python dictionary and `QP2Parameters`:
    ```python
    d = { 'ignore-case': True }
-   QpParameters = DataFactory('qp2')
-   inputs['parameters'] = QpParameters(dict=d)
+   QP2Parameters = DataFactory('qp2')
+   inputs['parameters'] = QP2Parameters(dict=d)
    ```
 
 ## Installation
