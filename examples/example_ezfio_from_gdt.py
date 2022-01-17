@@ -3,8 +3,7 @@
 """Load the basis set from the database.
 
 Usage:
-  (1) ./example_createEZFIO_fromGDT.py
-  (2) verdi run example_createEZFIO_fromGDT.py
+  ./example_ezfio_from_gdt.py
 """
 from os import path
 from pymatgen.core import Molecule
@@ -53,9 +52,6 @@ def test_run_create_ezfio(code, computer):
     # create a StructureData node for the calculation
     mol = Molecule.from_file(path.join(INPUT_DIR, XYZ_FILE))
     structure = orm.StructureData(pymatgen_molecule=mol)
-    # uncomment to see how Molecule->StructureData conversion modifies the atomic positions
-    #mol2 = structure.get_pymatgen_molecule()
-    #print(mol2)
 
     # Basis set section: build a dictionary with
     #   key   - label of the atom
@@ -80,16 +76,13 @@ def test_run_create_ezfio(code, computer):
             'charge': '0',
             'output': EZFIO_NAME,
         },
-        'xyz': XYZ_FILE,
-        'ezfio_name': EZFIO_NAME
+        'xyz': XYZ_FILE
     }
 
     builder.basissets = basis_dict
 
     builder.metadata.options.output_filename = 'qp.out'
-    builder.metadata.options.output_ezfio_basename = create_parameters[
-        'ezfio_name']
-    builder.metadata.options.computer = computer.label
+    builder.metadata.options.output_wf_basename = EZFIO_NAME
 
     # ============== CREATE_EZFIO SPECIFIC PARAMETERS =========== #
 
@@ -110,35 +103,29 @@ def test_run_create_ezfio(code, computer):
 
     print('\nQP2 create_ezfio execution: FINISHED\n')
 
-    ezfio_RemoteData = result['output_ezfio']
-    path_to_ezfio = ezfio_RemoteData.get_remote_path()
-    #computer_with_ezfio = ezfio_RemoteData.get_computer_name()
-
-    ezfio_full_name = path_to_ezfio.split('/')[-1]
-    #ezfio_base_name = ezfio_full_name.split('.tar.gz')[0]
+    ezfio_RemoteData = result['output_wavefunction']
+    ezfio_full_name = ezfio_RemoteData.filename
 
     print('EZFIO RemoteData name   : ', ezfio_full_name)
     print('EZFIO RemoteData object : ', ezfio_RemoteData)
-    print('EZFIO RemoteData path   : ', path_to_ezfio)
 
-    #return ezfio_RemoteData
     return 0
 
 
 @click.command()
 @cmdline.utils.decorators.with_dbenv()
 def cli():
-    """Run example_createEZFIO_fromGDT: create EZFIO using GTO basis sets from aiida-gaussian-datatypes plugin
+    """Create EZFIO using GTO basis sets from aiida-gaussian-datatypes plugin
 
     Creates an EZFIO database from the existing XYZ (hcn.xyz) file using `qp create_ezfio [arguments]` command;
 
     Output: ezfio (AiiDA-native RemoteData object) from the AiiDA database.
 
-    Example usage: $ ./example_createEZFIO_fromGDT.py
+    Example usage: $ ./example_ezfio_from_gdt.py
 
-    Alternative:   $ verdi run example_createEZFIO_fromGDT.py
+    Alternative:   $ verdi run example_ezfio_from_gdt.py
 
-    Help: $ ./example_createEZFIO_fromGDT.py --help
+    Help: $ ./example_ezfio_from_gdt.py --help
     """
 
     (code, computer) = load_aiida_setup()

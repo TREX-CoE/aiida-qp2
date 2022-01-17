@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Run a test calculation on the computer.
 
-Usage: ./example_scf_fromEZFIO.py
+Usage: ./example_scf_from_ezfio.py
 """
 from os import path
 import click
@@ -52,7 +52,10 @@ def test_run_scf(qp2_code, computer, ezfio_name):
         'code': qp2_code,
         'parameters': Dict(dict=qp2_parameters),
         'metadata': {
-            'computer': computer
+            'computer': computer,
+            'options': {
+                'output_wf_basename': ezfio_name
+            }
         }
     }
 
@@ -68,15 +71,15 @@ def test_run_scf(qp2_code, computer, ezfio_name):
 @cmdline.params.options.COMPUTER()
 @click.option('--ezfio_filename', '-e', help='EZFIO file name.')
 def cli(code, computer, ezfio_filename):
-    """Run example_scf_fromEZFIO: SCF calculation using QP2 on existing EZFIO database.
+    """Run example_scf_from_ezfio: SCF calculation using QP2 on existing EZFIO database.
 
     Example usage:
-    $ ./example_scf_fromEZFIO.py --code qp2@localhost --computer localhost --ezfio_filename hcn.ezfio
+    $ ./example_scf_from_ezfio.py --code qp2@localhost --computer localhost --ezfio_filename hcn.ezfio
 
     Alternative usage (loads qp2@tutor code and tutor computer):
-    $ ./example_scf_fromEZFIO.py
+    $ ./example_scf_from_ezfio.py
 
-    Help: $ ./example_scf_fromEZFIO.py --help
+    Help: $ ./example_scf_from_ezfio.py --help
     """
 
     test_run_scf(code, computer, ezfio_filename)

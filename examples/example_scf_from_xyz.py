@@ -3,8 +3,8 @@
 """Run a 2-step test QP calculation.
 
 Usage:
-  (1) ./example_scf_fromXYZ.py
-  (2) verdi run example_scf_fromXYZ.py
+  (1) ./example_scf_from_xyz.py
+  (2) verdi run example_scf_from_xyz.py
 """
 from os import path
 from pymatgen.core import Molecule
@@ -142,7 +142,7 @@ def test_run_scf_from_ezfio(code, computer, ezfio_RemoteData_inp):
 @click.command()
 @cmdline.utils.decorators.with_dbenv()
 def cli():
-    """Run example_scf_fromXYZ.py : execute 2 jobs using QP code.
+    """Run example_scf_from_xyz.py : execute 2 jobs using QP code.
 
     Job #1: create an EZFIO database from the existing XYZ (hcn.xyz) file using `qp create_ezfio [arguments]` command;
 
@@ -152,11 +152,11 @@ def cli():
 
         Output: SCF energy (AiiDA-native Float object) from the AiiDA database
 
-    Example usage: $ ./example_scf_fromXYZ.py
+    Example usage: $ ./example_scf_from_xyz.py
 
-    Alternative:   $ verdi run example_scf_fromXYZ.py
+    Alternative:   $ verdi run example_scf_from_xyz.py
 
-    Help: $ ./example_scf_fromXYZ.py --help
+    Help: $ ./example_scf_from_xyz.py --help
     """
     (code, computer) = load_aiida_setup()
     wf1 = test_run_create_ezfio(code, computer)
