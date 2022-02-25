@@ -21,7 +21,7 @@ class QP2Calculation(CalcJob):
 
     # Defaults
     _INPUT_FILE = 'aiida.inp'
-    _INPUT_COORDS_FILE = 'aiida.coords.xyz'
+    _INPUT_COORDS_FILE = 'aiida.xyz'
     _BASIS_FILE = 'aiida-basis-set'
     _PSEUDO_FILE = 'aiida-pseudo'
     QP_INIT = False
@@ -38,7 +38,7 @@ class QP2Calculation(CalcJob):
         spec.input('parameters', valid_type=Dict, required=True,
                 help='Input parameters to generate the input file.')
 
-        spec.input('structure', valid_type=StructureData, required=False, help='Input structrue')
+        spec.input('structure', valid_type=StructureData, required=False, help='Input structrure')
 
         spec.input('wavefunction', valid_type=SinglefileData, required=False, help='The wavefunction file (EZFIO or TREXIO).')
 
@@ -102,12 +102,14 @@ class QP2Calculation(CalcJob):
         parameters = self.inputs.parameters.get_dict()
 
         # check the input parameters for consistency
-        if 'xyz' in parameters.keys() and 'wavefunction' in self.inputs.keys():
-            raise Exception('JOB SETUP ERROR: `xyz` and `wavefunction` parameters cannot be specified simultaneously.')
-        if not 'xyz' in parameters.keys() and not 'wavefunction' in self.inputs.keys():
-            raise Exception('JOB SETUP ERROR: either `xyz` or `wavefunction` parameter has to be specified.')
-        # if `xyz` parameter is provided then this job corresponds to creation of the wavefunction file
-        if 'xyz' in parameters.keys() and not 'wavefunction' in self.inputs.keys():
+        if 'qp_create_ezfio' in parameters.keys() and 'wavefunction' in self.inputs.keys():
+            raise Exception('JOB SETUP ERROR: `qp_create_ezfio` and `wavefunction` parameters cannot be specified simultaneously.')
+        if not 'qp_create_ezfio' in parameters.keys() and not 'wavefunction' in self.inputs.keys():
+            raise Exception('JOB SETUP ERROR: either `qp_create_ezfio` or `wavefunction` parameter has to be specified.')
+        # if `qp_create_ezfio` parameter is provided then this job corresponds to creation of the wavefunction file
+        if 'qp_create_ezfio' in parameters.keys() and not 'wavefunction' in self.inputs.keys():
+            if self.inputs.structure is None:
+                raise Exception('JOB SETUP ERROR: StructureData has to be provided as an input to create an EZFIO file.')
             QP_INIT = True
         else:
             QP_INIT = False
@@ -120,8 +122,6 @@ class QP2Calculation(CalcJob):
         # safety check
         if '.tar.gz' in output_wf_basename:
             output_wf_basename.replace('.tar.gz', '')
-        # extract the name of the XYZ file for create_ezfio job
-        xyz_name = parameters['xyz'] if QP_INIT else None
 
         # Prepare a `CodeInfo` to be returned to the engine
         codeinfo = CodeInfo()
@@ -172,15 +172,18 @@ class QP2Calculation(CalcJob):
         calcinfo.retrieve_list = [self.metadata.options.output_filename]
         calcinfo.retrieve_list.append(f'{output_wf_basename}.tar.gz')
 
-        inp_structure = None
+        # Create the XYZ file for QP_INIT
         if 'structure' in self.inputs:
-            self._INPUT_COORDS_FILE = xyz_name
             # write StructureData in the ASE (Atoms) format
             #inp_structure = self.inputs.structure.get_ase()
             #ase.io.write(folder.get_abs_path(self._INPUT_COORDS_FILE), inp_structure, format='xyz')
             # write StructureData in the pymatgen (Molecule) format
-            inp_structure = self.inputs.structure.get_pymatgen_molecule()
-            inp_structure.to(filename=folder.get_abs_path(self._INPUT_COORDS_FILE), fmt='xyz')
+            #inp_structure = self.inputs.structure.get_pymatgen_molecule()
+            #inp_structure.to(filename=folder.get_abs_path(self._INPUT_COORDS_FILE), fmt='xyz')
+            # NOTE: conversion from XYZ to StructureData translates all coordinates by +5.0 (internal AiiDA issue)
+            self.inputs.structure.export(folder.get_abs_path(self._INPUT_COORDS_FILE), fileformat='xyz', overwrite=True)
+            parameters['xyz_file'] = self._INPUT_COORDS_FILE
+
 
         input_string = QP2Calculation._render_input_string_from_params(
             parameters, input_wf_basename, output_wf_basename
@@ -197,12 +200,10 @@ class QP2Calculation(CalcJob):
         """ Generate the QP submission file based on the contents of the input `parameters` dictionary.
         """
 
-        if 'qp_create_ezfio' in parameters.keys() and 'xyz' in parameters.keys():
+        if 'qp_create_ezfio' in parameters.keys():
             QP_INIT = True
             # Extract the list of command line options for create_ezfio
             create_commands = parameters['qp_create_ezfio']
-            # Extract the name of XYZ file for create_ezfio
-            xyz_name = parameters['xyz']
         else:
             QP_INIT = False
 
@@ -225,11 +226,7 @@ class QP2Calculation(CalcJob):
             for param, value in create_commands.items():
                 create_ezfio_command += f' --{param}={value}'
 
-            if not xyz_name is None:
-                create_ezfio_command += f' -- {xyz_name}'
-            else:
-                raise Exception('Missing "xyz" key in the parameters dict.')
-
+            create_ezfio_command += f" -- {parameters['xyz_file']}"
 
         # ALWAYS build header of the execution script with prepend_commands, e.g. bash
         input_list = [
