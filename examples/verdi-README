@@ -1,0 +1,33 @@
+
+# on my machine (to activate aiida Python venv):
+# activate-aiida
+
+# activate tab completion of verdi
+eval "$(_VERDI_COMPLETE=source verdi)"
+
+# list all processed (including finished ones)
+verdi process list -a
+
+# print info about the Code node
+verdi code show qp2_singularity
+
+# print info (computer name and absolute path) of the RemoteData node
+verdi data remote show 85be9121
+
+# ls the RemoteData node
+verdi data remote ls 85be9121
+
+# cat the QP output file (qp.out) associated with RemoteData node
+verdi data remote cat 85be9121 qp.out
+
+# open the StructureData node with the ASE viewer
+verdi data structure show ed644407
+
+# print the Dict contents
+verdi data dict show 89758fcb
+
+# show info associated with the node (useful for CalJob nodes)
+verdi node show e7d2dc15
+
+# graph with all incoming and outcoming links for a PK or UUID node
+verdi graph generate -l all <PK>
