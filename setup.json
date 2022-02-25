@@ -1,6 +1,6 @@
 {
     "name": "qp2",
-    "author": "TREX-CoE",
+    "author": "Evgeny Posenitskiy",
     "author_email": "posenitskiy@irsamc.ups-tlse.fr",
     "description": "AiiDA plugin for the Quanum Package 2.0",
     "url": "https://github.com/TREX-CoE/aiida-qp2",
@@ -9,22 +9,15 @@
         "Programming Language :: Python",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
-        "Natural Language :: English",
         "Framework :: AiiDA"
     ],
     "version": "0.2.0",
     "entry_points": {
-        "aiida.data": [
-            "qp2 = qp2.data:QP2Parameters"
-        ],
         "aiida.calculations": [
             "qp2 = qp2.calculations:QP2Calculation"
         ],
         "aiida.parsers": [
             "qp2 = qp2.parsers:QP2Parser"
-        ],
-        "aiida.cmdline.data": [
-            "qp2 = qp2.cli:data_cli"
         ]
     },
     "include_package_data": true,
@@ -35,14 +28,12 @@
         "sqlalchemy<1.4",
         "six",
         "psycopg2-binary<2.9",
-        "voluptuous",
         "pymatgen>=3.3.5"
     ],
     "extras_require": {
         "testing": [
             "pgtest~=1.3.1",
             "wheel~=0.31",
-            "coverage",
             "pytest~=6.0",
             "pytest-cov",
             "pymatgen"
