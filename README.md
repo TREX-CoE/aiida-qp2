@@ -11,9 +11,9 @@ intended to help developers get started with their AiiDA plugins.
 
 ## Repository contents
 
-* [`qp2/`](qp2/): The main source code of the plugin package
-  * [`calculations.py`](qp2/calculations.py): A new `QP2Calculation` `CalcJob` class
-  * [`parsers.py`](qp2/parsers.py): A new `Parser` for the `QP2Calculation`
+* [`aiida_qp2/`](aiida_qp2/): The main source code of the plugin package
+  * [`calculations.py`](aiida_qp2/calculations.py): A new `QP2Calculation` `CalcJob` class
+  * [`parsers.py`](aiida_qp2/parsers.py): A new `Parser` for the `QP2Calculation`
 * [`docs/`](docs/): A documentation template. The [ReadTheDocs documentation](https://trex-coe.github.io/aiida-qp2/) is built and deployed on the `gh-pages` branch.
 * [`examples/`](examples/): Examples of how to submit a calculation using this plugin
 * [`LICENSE`](LICENSE): License for your plugin
