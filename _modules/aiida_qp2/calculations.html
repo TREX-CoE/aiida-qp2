@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qp2.calculations &mdash; qp2 0.2.0 documentation</title>
+  <title>aiida_qp2.calculations &mdash; aiida-qp2 0.2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/contentui.css" type="text/css" />
@@ -18,7 +18,7 @@
         <script src="../../_static/contentui.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="search" type="application/opensearchdescription+xml"
-          title="Search within qp2 0.2.0 documentation"
+          title="Search within aiida-qp2 0.2.0 documentation"
           href="../../_static/opensearch.xml"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -29,7 +29,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> qp2
+            <a href="../../index.html" class="icon icon-home"> aiida-qp2
           </a>
               <div class="version">
                 0.2
@@ -45,7 +45,7 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../user_guide/index.html">User guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developer_guide/index.html">Developer guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../apidoc/qp2.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc/aiida_qp2.html">API documentation</a></li>
 </ul>
 
         </div>
@@ -54,7 +54,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">qp2</a>
+          <a href="../../index.html">aiida-qp2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -63,7 +63,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>qp2.calculations</li>
+      <li>aiida_qp2.calculations</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -72,7 +72,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for qp2.calculations</h1><div class="highlight"><pre>
+  <h1>Source code for aiida_qp2.calculations</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Calculations provided by qp2.</span>
@@ -90,7 +90,7 @@
 <span class="kn">from</span> <span class="nn">pymatgen.core.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span>
 
 
-<div class="viewcode-block" id="QP2Calculation"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.QP2Calculation">[docs]</a><span class="k">class</span> <span class="nc">QP2Calculation</span><span class="p">(</span><span class="n">CalcJob</span><span class="p">):</span>
+<div class="viewcode-block" id="QP2Calculation"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.calculations.QP2Calculation">[docs]</a><span class="k">class</span> <span class="nc">QP2Calculation</span><span class="p">(</span><span class="n">CalcJob</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; AiiDA calculation plugin wrapping the Quantum Package code.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -101,7 +101,7 @@
     <span class="n">_PSEUDO_FILE</span> <span class="o">=</span> <span class="s1">&#39;aiida-pseudo&#39;</span>
     <span class="n">QP_INIT</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="QP2Calculation.define"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.QP2Calculation.define">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="QP2Calculation.define"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.calculations.QP2Calculation.define">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">define</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Define inputs and outputs of the calculation.&quot;&quot;&quot;</span>
         <span class="c1"># yapf: disable</span>
@@ -164,7 +164,7 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">exit_code</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;ERROR_MISSING_ENERGY&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;Energy value is not present in the output file.&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="QP2Calculation.prepare_for_submission"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.QP2Calculation.prepare_for_submission">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_for_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+<div class="viewcode-block" id="QP2Calculation.prepare_for_submission"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.calculations.QP2Calculation.prepare_for_submission">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_for_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create input files.</span>
 
@@ -270,7 +270,7 @@
         <span class="k">return</span> <span class="n">calcinfo</span></div>
 
 
-<div class="viewcode-block" id="QP2Calculation._render_input_string_from_params"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.QP2Calculation._render_input_string_from_params">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="QP2Calculation._render_input_string_from_params"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.calculations.QP2Calculation._render_input_string_from_params">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_render_input_string_from_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">input_wf_basename</span><span class="p">,</span> <span class="n">output_wf_basename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Generate the QP submission file based on the contents of the input `parameters` dictionary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -340,16 +340,16 @@
 <span class="c1"># the code below is copied from the utils/data_helpers.py of the aiida-cp2k plugin</span>
 <span class="c1"># https://github.com/aiidateam/aiida-cp2k/blob/develop/aiida_cp2k/utils/datatype_helpers.py</span>
 
-<div class="viewcode-block" id="validate_basissets_namespace"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.validate_basissets_namespace">[docs]</a><span class="k">def</span> <span class="nf">validate_basissets_namespace</span><span class="p">(</span><span class="n">basissets</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+<div class="viewcode-block" id="validate_basissets_namespace"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.calculations.validate_basissets_namespace">[docs]</a><span class="k">def</span> <span class="nf">validate_basissets_namespace</span><span class="p">(</span><span class="n">basissets</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A input_namespace validator to ensure passed down basis sets have the correct type.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_validate_gdt_namespace</span><span class="p">(</span><span class="n">basissets</span><span class="p">,</span> <span class="n">DataFactory</span><span class="p">(</span><span class="s1">&#39;gaussian.basisset&#39;</span><span class="p">),</span> <span class="s1">&#39;basis set&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="validate_pseudos_namespace"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.validate_pseudos_namespace">[docs]</a><span class="k">def</span> <span class="nf">validate_pseudos_namespace</span><span class="p">(</span><span class="n">pseudos</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+<div class="viewcode-block" id="validate_pseudos_namespace"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.calculations.validate_pseudos_namespace">[docs]</a><span class="k">def</span> <span class="nf">validate_pseudos_namespace</span><span class="p">(</span><span class="n">pseudos</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A input_namespace validator to ensure passed down pseudopentials have the correct type.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_validate_gdt_namespace</span><span class="p">(</span><span class="n">pseudos</span><span class="p">,</span> <span class="n">DataFactory</span><span class="p">(</span><span class="s1">&#39;gaussian.pseudo&#39;</span><span class="p">),</span> <span class="s1">&#39;pseudo&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="_validate_gdt_namespace"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations._validate_gdt_namespace">[docs]</a><span class="k">def</span> <span class="nf">_validate_gdt_namespace</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">gdt_cls</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+<div class="viewcode-block" id="_validate_gdt_namespace"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.calculations._validate_gdt_namespace">[docs]</a><span class="k">def</span> <span class="nf">_validate_gdt_namespace</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">gdt_cls</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Common namespace validator for both basissets and pseudos&quot;&quot;&quot;</span>
 
     <span class="n">identifiers</span> <span class="o">=</span> <span class="p">[]</span>
@@ -370,7 +370,7 @@
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="_unpack"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations._unpack">[docs]</a><span class="k">def</span> <span class="nf">_unpack</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>
+<div class="viewcode-block" id="_unpack"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.calculations._unpack">[docs]</a><span class="k">def</span> <span class="nf">_unpack</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Unpack any lists as values into single elements for the key&quot;&quot;&quot;</span>
 
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">adict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>

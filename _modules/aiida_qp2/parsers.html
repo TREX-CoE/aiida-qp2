@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qp2.parsers &mdash; qp2 0.2.0 documentation</title>
+  <title>aiida_qp2.parsers &mdash; aiida-qp2 0.2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/contentui.css" type="text/css" />
@@ -18,7 +18,7 @@
         <script src="../../_static/contentui.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="search" type="application/opensearchdescription+xml"
-          title="Search within qp2 0.2.0 documentation"
+          title="Search within aiida-qp2 0.2.0 documentation"
           href="../../_static/opensearch.xml"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -29,7 +29,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html" class="icon icon-home"> qp2
+            <a href="../../index.html" class="icon icon-home"> aiida-qp2
           </a>
               <div class="version">
                 0.2
@@ -45,7 +45,7 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../user_guide/index.html">User guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developer_guide/index.html">Developer guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../apidoc/qp2.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc/aiida_qp2.html">API documentation</a></li>
 </ul>
 
         </div>
@@ -54,7 +54,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">qp2</a>
+          <a href="../../index.html">aiida-qp2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -63,7 +63,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>qp2.parsers</li>
+      <li>aiida_qp2.parsers</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -72,7 +72,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for qp2.parsers</h1><div class="highlight"><pre>
+  <h1>Source code for aiida_qp2.parsers</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Parsers provided by qp2.</span>
@@ -91,11 +91,11 @@
 <span class="n">QP2Calculation</span> <span class="o">=</span> <span class="n">CalculationFactory</span><span class="p">(</span><span class="s1">&#39;qp2&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="QP2Parser"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.parsers.QP2Parser">[docs]</a><span class="k">class</span> <span class="nc">QP2Parser</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
+<div class="viewcode-block" id="QP2Parser"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.parsers.QP2Parser">[docs]</a><span class="k">class</span> <span class="nc">QP2Parser</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parser class for parsing output of calculation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="QP2Parser.__init__"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.parsers.QP2Parser.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+<div class="viewcode-block" id="QP2Parser.__init__"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.parsers.QP2Parser.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize Parser instance</span>
 
@@ -108,7 +108,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">process_class</span><span class="p">,</span> <span class="n">QP2Calculation</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ParsingError</span><span class="p">(</span><span class="s1">&#39;Can only parse QP2Calculation&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="QP2Parser.parse"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.parsers.QP2Parser.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=too-many-locals</span>
+<div class="viewcode-block" id="QP2Parser.parse"><a class="viewcode-back" href="../../apidoc/aiida_qp2.html#aiida_qp2.parsers.QP2Parser.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=too-many-locals</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parse outputs, store results in database.</span>
 

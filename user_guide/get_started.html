@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting started &mdash; qp2 0.2.0 documentation</title>
+  <title>Getting started &mdash; aiida-qp2 0.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/contentui.css" type="text/css" />
@@ -19,7 +19,7 @@
         <script src="../_static/contentui.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" type="application/opensearchdescription+xml"
-          title="Search within qp2 0.2.0 documentation"
+          title="Search within aiida-qp2 0.2.0 documentation"
           href="../_static/opensearch.xml"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,7 +32,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> qp2
+            <a href="../index.html" class="icon icon-home"> aiida-qp2
           </a>
               <div class="version">
                 0.2
@@ -57,7 +57,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../developer_guide/index.html">Developer guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/qp2.html">API documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/aiida_qp2.html">API documentation</a></li>
 </ul>
 
         </div>
@@ -66,7 +66,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">qp2</a>
+          <a href="../index.html">aiida-qp2</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -99,7 +99,7 @@ a short example on how to use the plugin.</p>
 <span class="n">verdi</span> <span class="n">calculation</span> <span class="n">plugins</span>  <span class="c1"># should now show your calclulation plugins</span>
 </pre></div>
 </div>
-<p>Then use <code class="docutils literal notranslate"><span class="pre">verdi</span> <span class="pre">code</span> <span class="pre">setup</span></code> with the <code class="docutils literal notranslate"><span class="pre">qp2</span></code> input plugin
+<p>Then use <code class="docutils literal notranslate"><span class="pre">verdi</span> <span class="pre">code</span> <span class="pre">setup</span></code> with the <code class="docutils literal notranslate"><span class="pre">aiida_qp2</span></code> input plugin
 to set up an AiiDA code for qp2.</p>
 </section>
 <section id="usage">
@@ -111,17 +111,12 @@ to set up an AiiDA code for qp2.</p>
 <span class="n">verdi</span> <span class="n">calculation</span> <span class="nb">list</span> <span class="o">-</span><span class="n">a</span>  <span class="c1"># check status of calculation</span>
 </pre></div>
 </div>
-<p>If you have already set up your own qp2 code using
-<code class="docutils literal notranslate"><span class="pre">verdi</span> <span class="pre">code</span> <span class="pre">setup</span></code>, you may want to try the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qp2</span><span class="o">-</span><span class="n">submit</span>  <span class="c1"># uses qp2.cli</span>
-</pre></div>
-</div>
 </section>
 <section id="available-calculations">
 <h2>Available calculations<a class="headerlink" href="#available-calculations" title="Permalink to this headline">¶</a></h2>
 <dl>
 <dt class="sig sig-object py">
-<em class="property"><span class="pre">calcjob</span></em><span class="sig-prename descclassname"><span class="pre">qp2.calculations.</span></span><span class="sig-name descname"><span class="pre">QP2Calculation</span></span></dt>
+<em class="property"><span class="pre">calcjob</span></em><span class="sig-prename descclassname"><span class="pre">aiida_qp2.calculations.</span></span><span class="sig-name descname"><span class="pre">QP2Calculation</span></span></dt>
 <dd><p> AiiDA calculation plugin wrapping the Quantum Package code.
     </p>
 <p><strong>Inputs:</strong><ul>

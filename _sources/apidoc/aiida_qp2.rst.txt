@@ -1,23 +1,23 @@
-qp2 package
-===========
+aiida\_qp2 package
+==================
 
 Submodules
 ----------
 
-qp2.calculations module
------------------------
+aiida\_qp2.calculations module
+------------------------------
 
-.. automodule:: qp2.calculations
+.. automodule:: aiida_qp2.calculations
    :members:
    :special-members:
    :private-members:
    :undoc-members:
    :show-inheritance:
 
-qp2.parsers module
-------------------
+aiida\_qp2.parsers module
+-------------------------
 
-.. automodule:: qp2.parsers
+.. automodule:: aiida_qp2.parsers
    :members:
    :special-members:
    :private-members:
@@ -27,7 +27,7 @@ qp2.parsers module
 Module contents
 ---------------
 
-.. automodule:: qp2
+.. automodule:: aiida_qp2
    :members:
    :special-members:
    :private-members:
