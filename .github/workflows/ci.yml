@@ -75,7 +75,7 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@4.1.0
       with:
           branch: gh-pages
-          folder: ./docs/build
+          folder: ./docs/build/html
 
   pre-commit:
     runs-on: ubuntu-latest
