@@ -71,6 +71,11 @@ jobs:
         reentry scan -r aiida
     - name: Build docs
       run: cd docs && make
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@4.1.0
+      with:
+          branch: gh-pages
+          folder: ./docs/build
 
   pre-commit:
     runs-on: ubuntu-latest
