@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/TREX-CoE/aiida-qp2/workflows/ci/badge.svg?branch=master)](https://github.com/q-posev/aiida-qp2/actions)
+[![Build Status](https://github.com/TREX-CoE/aiida-qp2/workflows/ci/badge.svg?branch=master)](https://github.com/TREX-CoE/aiida-qp2/actions)
 [![PyPI version](https://badge.fury.io/py/aiida-qp2.svg)](https://badge.fury.io/py/aiida-qp2)
 
 # aiida-qp2

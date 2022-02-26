@@ -10,14 +10,14 @@ Installation
 
 Use the following commands to install the plugin::
 
-    git clone https://github.com/q-posev/aiida-qp2 .
+    git clone https://github.com/TREX-CoE/aiida-qp2 .
     cd aiida-qp2
     pip install -e .  # also installs aiida, if missing (but not postgres)
     #pip install -e .[pre-commit,testing] # install extras for more features
     verdi quicksetup  # better to set up a new profile
     verdi calculation plugins  # should now show your calclulation plugins
 
-Then use ``verdi code setup`` with the ``aiida_qp2`` input plugin
+Then use ``verdi code setup`` with the ``qp2`` input plugin
 to set up an AiiDA code for qp2.
 
 Usage
