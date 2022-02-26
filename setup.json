@@ -1,11 +1,12 @@
 {
-    "name": "qp2",
+    "name": "aiida-qp2",
     "author": "Evgeny Posenitskiy",
     "author_email": "posenitskiy@irsamc.ups-tlse.fr",
-    "description": "AiiDA plugin for the Quanum Package 2.0",
+    "description": "AiiDA plugin for the Quantum Package 2.0",
     "url": "https://github.com/TREX-CoE/aiida-qp2",
     "license": "MIT",
     "classifiers": [
+	"Development Status :: 4 - Beta",
         "Programming Language :: Python",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
@@ -14,10 +15,10 @@
     "version": "0.2.0",
     "entry_points": {
         "aiida.calculations": [
-            "qp2 = qp2.calculations:QP2Calculation"
+            "qp2 = aiida_qp2.calculations:QP2Calculation"
         ],
         "aiida.parsers": [
-            "qp2 = qp2.parsers:QP2Parser"
+            "qp2 = aiida_qp2.parsers:QP2Parser"
         ]
     },
     "include_package_data": true,
@@ -28,6 +29,7 @@
         "sqlalchemy<1.4",
         "six",
         "psycopg2-binary<2.9",
+        "voluptuous",
         "pymatgen>=3.3.5"
     ],
     "extras_require": {
