@@ -13,7 +13,7 @@ The aiida-qp2 plugin for `AiiDA`_
 
    user_guide/index
    developer_guide/index
-   API documentation <apidoc/qp2>
+   API documentation <apidoc/aiida_qp2>
 
 If you use this plugin for your research, please cite the following work:
 

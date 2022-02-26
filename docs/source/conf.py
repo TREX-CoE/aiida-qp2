@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Sphinx configuration for qp2
+# Sphinx configuration for aiida-qp2
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -15,7 +15,7 @@ import os
 import sys
 import time
 
-import qp2
+import aiida_qp2
 from aiida.manage.configuration import load_documentation_profile
 
 # -- AiiDA-related setup --------------------------------------------------
@@ -70,7 +70,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'qp2'
+project = u'aiida-qp2'
 copyright_first_year = '2021'
 copyright_owners = 'TREX-CoE'
 
@@ -86,7 +86,7 @@ copyright = u'{}, {}. All rights reserved'.format(copyright_year_string,
 # built documents.
 #
 # The full version, including alpha/beta/rc tags.
-release = qp2.__version__
+release = aiida_qp2.__version__
 # The short X.Y version.
 version = '.'.join(release.split('.')[:2])
 
@@ -211,7 +211,7 @@ html_show_sourcelink = False
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
 # base URL from which the finished HTML is served.
-html_use_opensearch = 'http://qp2.readthedocs.io'
+html_use_opensearch = 'http://aiida_qp2.readthedocs.io'
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
 #html_file_suffix = None
@@ -231,7 +231,7 @@ html_search_language = 'en'
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'qp2-doc'
+htmlhelp_basename = 'aiida-qp2-doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -286,7 +286,7 @@ def run_apidoc(_):
     """
     source_dir = os.path.abspath(os.path.dirname(__file__))
     apidoc_dir = os.path.join(source_dir, 'apidoc')
-    package_dir = os.path.join(source_dir, os.pardir, os.pardir, 'qp2')
+    package_dir = os.path.join(source_dir, os.pardir, os.pardir, 'aiida_qp2')
 
     # In #1139, they suggest the route below, but this ended up
     # calling sphinx-build, not sphinx-apidoc

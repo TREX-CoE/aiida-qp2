@@ -17,7 +17,7 @@ Use the following commands to install the plugin::
     verdi quicksetup  # better to set up a new profile
     verdi calculation plugins  # should now show your calclulation plugins
 
-Then use ``verdi code setup`` with the ``qp2`` input plugin
+Then use ``verdi code setup`` with the ``aiida_qp2`` input plugin
 to set up an AiiDA code for qp2.
 
 Usage
@@ -30,13 +30,8 @@ A quick demo of how to submit a calculation::
     verdi run test_submit.py        # submit test calculation
     verdi calculation list -a  # check status of calculation
 
-If you have already set up your own qp2 code using
-``verdi code setup``, you may want to try the following command::
-
-    qp2-submit  # uses qp2.cli
-
 Available calculations
 ++++++++++++++++++++++
 
 .. aiida-calcjob:: QP2Calculation
-    :module: qp2.calculations
+    :module: aiida_qp2.calculations
