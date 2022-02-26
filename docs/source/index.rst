@@ -2,10 +2,10 @@
     :width: 250px
     :align: center
 
-The qp2 plugin for `AiiDA`_
+The aiida-qp2 plugin for `AiiDA`_
 =====================================================
 
-``qp2`` is available at http://github.com/q-posev/aiida-qp2
+``aiida-qp2`` is available at http://github.com/q-posev/aiida-qp2
 
 
 .. toctree::
@@ -26,9 +26,9 @@ If you use AiiDA for your research, please cite the following work:
   for computational science*, Comp. Mat. Sci 111, 218-230 (2016);
   https://doi.org/10.1016/j.commatsci.2015.09.013; http://www.aiida.net.
 
-``qp2`` is released under the MIT license.
+``aiida-qp2`` is released under the MIT license.
 
-Please contact posenitskiy@irsamc.ups-tlse.fr for information concerning ``qp2`` and the `AiiDA mailing list <http://www.aiida.net/mailing-list/>`_ for questions concerning ``aiida``.
+Please contact posenitskiy@irsamc.ups-tlse.fr for information concerning ``aiida-qp2`` and the `AiiDA mailing list <http://www.aiida.net/mailing-list/>`_ for questions concerning ``aiida``.
 
 
 Indices and tables
