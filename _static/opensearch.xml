@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
   <ShortName>aiida-qp2</ShortName>
-  <Description>Search aiida-qp2 0.2.0 documentation</Description>
+  <Description>Search aiida-qp2 0.3.0 documentation</Description>
   <InputEncoding>utf-8</InputEncoding>
   <Url type="text/html" method="get"
        template="http://aiida_qp2.readthedocs.io/search.html?q={searchTerms}"/>
-  <LongName>aiida-qp2 0.2.0 documentation</LongName>
+  <LongName>aiida-qp2 0.3.0 documentation</LongName>
   
 </OpenSearchDescription>

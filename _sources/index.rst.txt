@@ -5,7 +5,7 @@
 The aiida-qp2 plugin for `AiiDA`_
 =====================================================
 
-``aiida-qp2`` is available at http://github.com/q-posev/aiida-qp2
+``aiida-qp2`` is available at http://github.com/TREX-CoE/aiida-qp2
 
 
 .. toctree::
