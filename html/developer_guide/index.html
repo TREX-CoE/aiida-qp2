@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developer guide &mdash; qp2 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/contentui.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/contentui.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within qp2 0.2.0 documentation"
+          href="../_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="qp2 package" href="../apidoc/qp2.html" />
+    <link rel="prev" title="Tutorial" href="../user_guide/tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> qp2
+          </a>
+              <div class="version">
+                0.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/index.html">User guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-tests">Running the tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#automatic-coding-style-checks">Automatic coding style checks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuous-integration">Continuous integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-the-documentation">Building the documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#publishing-the-documentation">Publishing the documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pypi-release">PyPI release</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/qp2.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">qp2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Developer guide</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="developer-guide">
+<h1>Developer guide<a class="headerlink" href="#developer-guide" title="Permalink to this headline">¶</a></h1>
+<section id="running-the-tests">
+<h2>Running the tests<a class="headerlink" href="#running-the-tests" title="Permalink to this headline">¶</a></h2>
+<p>The following will discover and run all unit test:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">testing</span><span class="p">]</span>
+<span class="n">pytest</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+</div>
+</section>
+<section id="automatic-coding-style-checks">
+<h2>Automatic coding style checks<a class="headerlink" href="#automatic-coding-style-checks" title="Permalink to this headline">¶</a></h2>
+<p>Enable enable automatic checks of code sanity and coding style:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">pre</span><span class="o">-</span><span class="n">commit</span><span class="p">]</span>
+<span class="n">pre</span><span class="o">-</span><span class="n">commit</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p>After this, the <a class="reference external" href="https://github.com/google/yapf">yapf</a> formatter,
+the <a class="reference external" href="https://www.pylint.org/">pylint</a> linter
+and the <a class="reference external" href="https://www.pylint.org/">pylint</a> code analyzer will
+run at every commit.</p>
+<p>If you ever need to skip these pre-commit hooks, just use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">n</span>
+</pre></div>
+</div>
+</section>
+<section id="continuous-integration">
+<h2>Continuous integration<a class="headerlink" href="#continuous-integration" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">qp2</span></code> comes with a <code class="docutils literal notranslate"><span class="pre">.github</span></code> folder that contains continuous integration tests on every commit using <a class="reference external" href="https://github.com/features/actions">GitHub Actions</a>. It will:</p>
+<ol class="arabic simple">
+<li><p>run all tests for the <code class="docutils literal notranslate"><span class="pre">django</span></code> ORM</p></li>
+<li><p>build the documentation</p></li>
+<li><p>check coding style and version number (not required to pass by default)</p></li>
+</ol>
+</section>
+<section id="building-the-documentation">
+<h2>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Install the <code class="docutils literal notranslate"><span class="pre">docs</span></code> extra:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">docs</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Edit the individual documentation pages:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docs</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">rst</span>
+<span class="n">docs</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">developer_guide</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">rst</span>
+<span class="n">docs</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">user_guide</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">rst</span>
+<span class="n">docs</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">user_guide</span><span class="o">/</span><span class="n">get_started</span><span class="o">.</span><span class="n">rst</span>
+<span class="n">docs</span><span class="o">/</span><span class="n">source</span><span class="o">/</span><span class="n">user_guide</span><span class="o">/</span><span class="n">tutorial</span><span class="o">.</span><span class="n">rst</span>
+</pre></div>
+</div>
+</li>
+<li><p>Use <a class="reference external" href="https://www.sphinx-doc.org/en/master/">Sphinx</a> to generate the html documentation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">docs</span>
+<span class="n">make</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+<p>Check the result by opening <code class="docutils literal notranslate"><span class="pre">build/html/index.html</span></code> in your browser.</p>
+</section>
+<section id="publishing-the-documentation">
+<h2>Publishing the documentation<a class="headerlink" href="#publishing-the-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Once you’re happy with your documentation, it’s easy to host it online on <a class="reference external" href="https://readthedocs.org/">ReadTheDocs</a>:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Create an account on <a class="reference external" href="https://readthedocs.org/">ReadTheDocs</a></p></li>
+<li><p>Import your <code class="docutils literal notranslate"><span class="pre">aiida-qp2</span></code> repository (preferably using <code class="docutils literal notranslate"><span class="pre">qp2</span></code> as the project name)</p></li>
+</ol>
+</div></blockquote>
+<p>The documentation is now available at <a class="reference external" href="http://qp2.readthedocs.io/">qp2.readthedocs.io</a>.</p>
+</section>
+<section id="pypi-release">
+<h2>PyPI release<a class="headerlink" href="#pypi-release" title="Permalink to this headline">¶</a></h2>
+<p>Your plugin is ready to be uploaded to the <a class="reference external" href="https://pypi.org/">Python Package Index</a>.
+Just register for an account and:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">twine</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">sdist</span> <span class="n">bdist_wheel</span>
+<span class="n">twine</span> <span class="n">upload</span> <span class="n">dist</span><span class="o">/*</span>
+</pre></div>
+</div>
+<p>After this, you (and everyone else) should be able to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">qp2</span>
+</pre></div>
+</div>
+<p>You can also enable <em>automatic</em> deployment of git tags to the python package index:
+simply generate a <a class="reference external" href="https://pypi.org/help/#apitoken">PyPI API token</a> for your PyPI account and add it as a secret to your GitHub repository under the name <code class="docutils literal notranslate"><span class="pre">pypi_token</span></code> (Go to Settings -&gt; Secrets).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When updating the plugin package to a new version, remember to update the version number both in <code class="docutils literal notranslate"><span class="pre">setup.json</span></code> and <code class="docutils literal notranslate"><span class="pre">qp2/__init__.py</span></code>.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../user_guide/tutorial.html" class="btn btn-neutral float-left" title="Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../apidoc/qp2.html" class="btn btn-neutral float-right" title="qp2 package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022, TREX-CoE. All rights reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

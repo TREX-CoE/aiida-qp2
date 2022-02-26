@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qp2.parsers &mdash; qp2 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/contentui.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/contentui.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within qp2 0.2.0 documentation"
+          href="../../_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> qp2
+          </a>
+              <div class="version">
+                0.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/index.html">User guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/index.html">Developer guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc/qp2.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">qp2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>qp2.parsers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qp2.parsers</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Parsers provided by qp2.</span>
+
+<span class="sd">Register parsers via the &quot;aiida.parsers&quot; entry point in setup.json.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">path_join</span>
+
+<span class="kn">from</span> <span class="nn">aiida.engine</span> <span class="kn">import</span> <span class="n">ExitCode</span>
+<span class="kn">from</span> <span class="nn">aiida.parsers.parser</span> <span class="kn">import</span> <span class="n">Parser</span>
+<span class="kn">from</span> <span class="nn">aiida.plugins</span> <span class="kn">import</span> <span class="n">CalculationFactory</span>
+<span class="kn">from</span> <span class="nn">aiida.common</span> <span class="kn">import</span> <span class="n">exceptions</span>
+<span class="kn">from</span> <span class="nn">aiida.orm</span> <span class="kn">import</span> <span class="n">Float</span><span class="p">,</span> <span class="n">SinglefileData</span>
+
+<span class="n">QP2Calculation</span> <span class="o">=</span> <span class="n">CalculationFactory</span><span class="p">(</span><span class="s1">&#39;qp2&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="QP2Parser"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.parsers.QP2Parser">[docs]</a><span class="k">class</span> <span class="nc">QP2Parser</span><span class="p">(</span><span class="n">Parser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parser class for parsing output of calculation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="QP2Parser.__init__"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.parsers.QP2Parser.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize Parser instance</span>
+
+<span class="sd">        Checks that the ProcessNode being passed was produced by a QP2Calculation.</span>
+
+<span class="sd">        :param node: ProcessNode of calculation</span>
+<span class="sd">        :param type node: :class:`aiida.orm.ProcessNode`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">process_class</span><span class="p">,</span> <span class="n">QP2Calculation</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ParsingError</span><span class="p">(</span><span class="s1">&#39;Can only parse QP2Calculation&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QP2Parser.parse"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.parsers.QP2Parser.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=too-many-locals</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse outputs, store results in database.</span>
+
+<span class="sd">        :returns: an exit code, if parsing fails (or nothing if parsing succeeds)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The filename containing output of the QP run</span>
+        <span class="n">output_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;output_filename&#39;</span><span class="p">)</span>
+        <span class="c1"># Get filename of the output wavefunction file (required)</span>
+        <span class="n">output_wf_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span>
+            <span class="s1">&#39;output_wf_basename&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.tar.gz&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieved</span>
+        <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">NotExistent</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_codes</span><span class="o">.</span><span class="n">ERROR_NO_RETRIEVED_FOLDER</span>
+
+        <span class="c1"># Check that folder content is as expected</span>
+        <span class="n">files_retrieved</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieved</span><span class="o">.</span><span class="n">list_object_names</span><span class="p">()</span>
+        <span class="n">files_expected</span> <span class="o">=</span> <span class="p">[</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">output_wf_filename</span><span class="p">]</span>
+        <span class="c1"># Note: set(A) &lt;= set(B) checks whether A is a subset of B</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">files_expected</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">files_retrieved</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Found files &#39;</span><span class="si">{}</span><span class="s2">&#39;, expected to find &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">files_retrieved</span><span class="p">,</span> <span class="n">files_expected</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exit_codes</span><span class="o">.</span><span class="n">ERROR_MISSING_OUTPUT_FILES</span>
+
+        <span class="c1"># OPTIONAL output part. Can be adapted to produce output_parameters Dict with output quantities</span>
+        <span class="c1"># Open the output_filename file and parse it (e.g. look for the computer SCF energy)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Parsing &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">output_filename</span><span class="p">))</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieved</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f_out</span><span class="p">:</span>
+            <span class="n">scf_en_found</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f_out</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;SCF energy&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                    <span class="n">scf_en_found</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">scf_en_found</span><span class="p">:</span>
+                <span class="n">energy</span> <span class="o">=</span> <span class="n">Float</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="s1">&#39;output_energy&#39;</span><span class="p">,</span> <span class="n">energy</span><span class="p">)</span>
+            <span class="c1"># TEMPORARILY disable this exit code to check qp_create_ezfio</span>
+            <span class="c1">#else:</span>
+            <span class="c1">#    return self.exit_codes.ERROR_MISSING_ENERGY</span>
+
+        <span class="c1"># build absolute path of the wavefunction file to store as SinglefileData node</span>
+        <span class="n">abs_path_wf_file</span> <span class="o">=</span> <span class="n">path_join</span><span class="p">(</span>
+            <span class="n">out_folder</span><span class="o">.</span><span class="n">_repository</span><span class="o">.</span><span class="n">_get_base_folder</span><span class="p">()</span><span class="o">.</span><span class="n">abspath</span><span class="p">,</span>  <span class="c1">#pylint: disable=protected-access</span>
+            <span class="n">output_wf_filename</span><span class="p">)</span>
+        <span class="c1"># Create a SinglefileData node corresponding to the output ezfio tarball</span>
+        <span class="n">wf_file</span> <span class="o">=</span> <span class="n">SinglefileData</span><span class="p">(</span><span class="n">abs_path_wf_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="s1">&#39;output_wavefunction&#39;</span><span class="p">,</span> <span class="n">wf_file</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ExitCode</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022, TREX-CoE. All rights reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

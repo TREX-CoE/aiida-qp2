@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qp2.calculations &mdash; qp2 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/contentui.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/contentui.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within qp2 0.2.0 documentation"
+          href="../../_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> qp2
+          </a>
+              <div class="version">
+                0.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/index.html">User guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_guide/index.html">Developer guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc/qp2.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">qp2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>qp2.calculations</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for qp2.calculations</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Calculations provided by qp2.</span>
+
+<span class="sd">Register calculations via the &quot;aiida.calculations&quot; entry point in setup.json.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># needed in _unpack function</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
+
+<span class="kn">from</span> <span class="nn">aiida.common</span> <span class="kn">import</span> <span class="n">CalcInfo</span><span class="p">,</span> <span class="n">CodeInfo</span>
+<span class="kn">from</span> <span class="nn">aiida.engine</span> <span class="kn">import</span> <span class="n">CalcJob</span>
+<span class="kn">from</span> <span class="nn">aiida.orm</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Code</span><span class="p">,</span> <span class="n">Str</span><span class="p">,</span> <span class="n">StructureData</span><span class="p">,</span> <span class="n">SinglefileData</span>
+<span class="kn">from</span> <span class="nn">aiida.plugins</span> <span class="kn">import</span> <span class="n">DataFactory</span>
+<span class="kn">from</span> <span class="nn">pymatgen.core.periodic_table</span> <span class="kn">import</span> <span class="n">Element</span>
+
+
+<div class="viewcode-block" id="QP2Calculation"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.QP2Calculation">[docs]</a><span class="k">class</span> <span class="nc">QP2Calculation</span><span class="p">(</span><span class="n">CalcJob</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; AiiDA calculation plugin wrapping the Quantum Package code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Defaults</span>
+    <span class="n">_INPUT_FILE</span> <span class="o">=</span> <span class="s1">&#39;aiida.inp&#39;</span>
+    <span class="n">_INPUT_COORDS_FILE</span> <span class="o">=</span> <span class="s1">&#39;aiida.xyz&#39;</span>
+    <span class="n">_BASIS_FILE</span> <span class="o">=</span> <span class="s1">&#39;aiida-basis-set&#39;</span>
+    <span class="n">_PSEUDO_FILE</span> <span class="o">=</span> <span class="s1">&#39;aiida-pseudo&#39;</span>
+    <span class="n">QP_INIT</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="QP2Calculation.define"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.QP2Calculation.define">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">define</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Define inputs and outputs of the calculation.&quot;&quot;&quot;</span>
+        <span class="c1"># yapf: disable</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">define</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+
+        <span class="c1"># Set default values for AiiDA options</span>
+
+        <span class="c1"># Dictionary of parameters, supported: qp_create_ezfio, qp_commands, qp_prepend, qp_append</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;parameters&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="n">Dict</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Input parameters to generate the input file.&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;structure&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="n">StructureData</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Input structrure&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;wavefunction&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="n">SinglefileData</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The wavefunction file (EZFIO or TREXIO).&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;settings&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="n">Dict</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Additional input parameters.&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="n">Code</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The `Code` to use for this job.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Output wavefunction base name</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;metadata.options.output_wf_basename&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;aiida.wf&#39;</span><span class="p">,</span>
+                <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Base name of the output wavefunction file (without .tar.gz or .h5).&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">input_namespace</span><span class="p">(</span>
+            <span class="s1">&#39;basissets&#39;</span><span class="p">,</span>
+            <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">validator</span><span class="o">=</span><span class="n">validate_basissets_namespace</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;A dictionary of basissets to be used in the calculations: key is the atomic symbol,&#39;</span>
+                  <span class="s1">&#39; value is either a single basisset.&#39;</span><span class="p">))</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">input_namespace</span><span class="p">(</span>
+            <span class="s1">&#39;pseudos&#39;</span><span class="p">,</span>
+            <span class="n">dynamic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">validator</span><span class="o">=</span><span class="n">validate_pseudos_namespace</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;A dictionary of pseudopotentials to be used in the calculations: key is the atomic symbol,&#39;</span>
+                  <span class="s1">&#39; value is a single pseudopotential.&#39;</span><span class="p">))</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;metadata.options.output_filename&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;aiida-qp2.out&#39;</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">][</span><span class="s1">&#39;parser_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s1">&#39;qp2&#39;</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="s1">&#39;metadata.options.withmpi&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;options&#39;</span><span class="p">][</span><span class="s1">&#39;resources&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;num_machines&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;num_mpiprocs_per_machine&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Output parameters</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="s1">&#39;output_energy&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="n">Float</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The result of the calculation&#39;</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">output_node</span> <span class="o">=</span> <span class="s1">&#39;output_energy&#39;</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="s1">&#39;output_wavefunction&#39;</span><span class="p">,</span> <span class="n">valid_type</span><span class="o">=</span><span class="n">SinglefileData</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The wave function file (EZFIO or TREXIO)&#39;</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">output_node</span> <span class="o">=</span> <span class="s1">&#39;output_wavefunction&#39;</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">exit_code</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;ERROR_NO_RETRIEVED_FOLDER&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;The retrieved folder data node could not be accessed.&#39;</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">exit_code</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="s1">&#39;ERROR_MISSING_OUTPUT_FILES&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;Calculation did not produce all expected output files.&#39;</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">exit_code</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="s1">&#39;ERROR_MISSING_ENERGY&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s1">&#39;Energy value is not present in the output file.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="QP2Calculation.prepare_for_submission"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.QP2Calculation.prepare_for_submission">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_for_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create input files.</span>
+
+<span class="sd">        :param folder: an `aiida.common.folders.Folder` where the plugin should temporarily place all files</span>
+<span class="sd">            needed by the calculation.</span>
+<span class="sd">        :return: `aiida.common.datastructures.CalcInfo` instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span> <span class="k">if</span> <span class="s1">&#39;settings&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span>
+
+        <span class="c1"># check the input parameters for consistency</span>
+        <span class="k">if</span> <span class="s1">&#39;qp_create_ezfio&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="s1">&#39;wavefunction&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;JOB SETUP ERROR: `qp_create_ezfio` and `wavefunction` parameters cannot be specified simultaneously.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;qp_create_ezfio&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s1">&#39;wavefunction&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;JOB SETUP ERROR: either `qp_create_ezfio` or `wavefunction` parameter has to be specified.&#39;</span><span class="p">)</span>
+        <span class="c1"># if `qp_create_ezfio` parameter is provided then this job corresponds to creation of the wavefunction file</span>
+        <span class="k">if</span> <span class="s1">&#39;qp_create_ezfio&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s1">&#39;wavefunction&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">structure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;JOB SETUP ERROR: StructureData has to be provided as an input to create an EZFIO file.&#39;</span><span class="p">)</span>
+            <span class="n">QP_INIT</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QP_INIT</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># extract the name of the wavefunction file</span>
+        <span class="n">wf_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">wavefunction</span><span class="o">.</span><span class="n">filename</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">QP_INIT</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">input_wf_basename</span> <span class="o">=</span> <span class="n">wf_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.tar.gz&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">wf_filename</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="c1"># extract the base name (without .tar.gz suffix)</span>
+        <span class="n">output_wf_basename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output_wf_basename</span>
+        <span class="c1"># safety check</span>
+        <span class="k">if</span> <span class="s1">&#39;.tar.gz&#39;</span> <span class="ow">in</span> <span class="n">output_wf_basename</span><span class="p">:</span>
+            <span class="n">output_wf_basename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.tar.gz&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Prepare a `CodeInfo` to be returned to the engine</span>
+        <span class="n">codeinfo</span> <span class="o">=</span> <span class="n">CodeInfo</span><span class="p">()</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">cmdline_params</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;cmdline&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">join_files</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">code_uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">code</span><span class="o">.</span><span class="n">uuid</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">stdin_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_INPUT_FILE</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">stdout_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output_filename</span>
+        <span class="n">codeinfo</span><span class="o">.</span><span class="n">withmpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">withmpi</span>
+
+        <span class="c1"># Prepare a `CalcInfo` to be returned to the engine</span>
+        <span class="n">calcinfo</span> <span class="o">=</span> <span class="n">CalcInfo</span><span class="p">()</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">cmdline_params</span> <span class="o">=</span> <span class="n">codeinfo</span><span class="o">.</span><span class="n">cmdline_params</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">stdin_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_INPUT_FILE</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">stdout_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output_filename</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">codes_info</span> <span class="o">=</span> <span class="p">[</span><span class="n">codeinfo</span><span class="p">]</span>
+        <span class="c1"># build the local_copy_list to copy the input wavefunction SinglefileData to the work directory</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">local_copy_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s1">&#39;wavefunction&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">calcinfo</span><span class="o">.</span><span class="n">local_copy_list</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">wavefunction</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">wf_filename</span><span class="p">,</span> <span class="n">wf_filename</span><span class="p">)</span>
+                    <span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">QP_INIT</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">calcinfo</span><span class="o">.</span><span class="n">local_copy_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># special case to use basissets and pseudos from aiida-gaussian-datatypes plugin</span>
+        <span class="k">if</span> <span class="s1">&#39;basissets&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="ow">and</span> <span class="n">QP_INIT</span><span class="p">:</span>
+            <span class="c1">#validate_basissets(inp, self.inputs.basissets, self.inputs.structure if &#39;structure&#39; in self.inputs else None)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_BASIS_FILE</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fhandle</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">basissets</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">elem_name</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span>
+                    <span class="n">fhandle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">elem_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">basissets</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span><span class="o">.</span><span class="n">to_qp</span><span class="p">(</span><span class="n">fhandle</span><span class="p">)</span>
+                    <span class="n">fhandle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;pseudos&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="ow">and</span> <span class="n">QP_INIT</span><span class="p">:</span>
+            <span class="c1">#validate_pseudos(inp, self.inputs.pseudos, self.inputs.structure if &#39;structure&#39; in self.inputs else None)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_PSEUDO</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fhandle</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">pseudos</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">elem_name</span> <span class="o">=</span> <span class="n">Element</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span><span class="o">.</span><span class="n">long_name</span>
+                    <span class="n">fhandle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">elem_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">pseudos</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span><span class="o">.</span><span class="n">to_gamess</span><span class="p">(</span><span class="n">fhandle</span><span class="p">)</span>
+                    <span class="n">fhandle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+        <span class="c1"># retrieve_list will copy the files from the remote machine to the local one (where AiiDA runs)</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">retrieve_list</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output_filename</span><span class="p">]</span>
+        <span class="n">calcinfo</span><span class="o">.</span><span class="n">retrieve_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">output_wf_basename</span><span class="si">}</span><span class="s1">.tar.gz&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Create the XYZ file for QP_INIT</span>
+        <span class="k">if</span> <span class="s1">&#39;structure&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
+            <span class="c1"># write StructureData in the ASE (Atoms) format</span>
+            <span class="c1">#inp_structure = self.inputs.structure.get_ase()</span>
+            <span class="c1">#ase.io.write(folder.get_abs_path(self._INPUT_COORDS_FILE), inp_structure, format=&#39;xyz&#39;)</span>
+            <span class="c1"># write StructureData in the pymatgen (Molecule) format</span>
+            <span class="c1">#inp_structure = self.inputs.structure.get_pymatgen_molecule()</span>
+            <span class="c1">#inp_structure.to(filename=folder.get_abs_path(self._INPUT_COORDS_FILE), fmt=&#39;xyz&#39;)</span>
+            <span class="c1"># NOTE: conversion from XYZ to StructureData translates all coordinates by +5.0 (internal AiiDA issue)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_INPUT_COORDS_FILE</span><span class="p">),</span> <span class="n">fileformat</span><span class="o">=</span><span class="s1">&#39;xyz&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;xyz_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_INPUT_COORDS_FILE</span>
+
+
+        <span class="n">input_string</span> <span class="o">=</span> <span class="n">QP2Calculation</span><span class="o">.</span><span class="n">_render_input_string_from_params</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="p">,</span> <span class="n">input_wf_basename</span><span class="p">,</span> <span class="n">output_wf_basename</span>
+            <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">get_abs_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_INPUT_FILE</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inp_file</span><span class="p">:</span>
+            <span class="n">inp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">calcinfo</span></div>
+
+
+<div class="viewcode-block" id="QP2Calculation._render_input_string_from_params"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.QP2Calculation._render_input_string_from_params">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_render_input_string_from_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">input_wf_basename</span><span class="p">,</span> <span class="n">output_wf_basename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Generate the QP submission file based on the contents of the input `parameters` dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;qp_create_ezfio&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">QP_INIT</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># Extract the list of command line options for create_ezfio</span>
+            <span class="n">create_commands</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;qp_create_ezfio&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">QP_INIT</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Extract the list of commands to be executed before the Quantum Package</span>
+        <span class="n">prepend_commands</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;qp_prepend&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;qp_prepend&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="c1"># Extract the list of QP-specific commands to be executed</span>
+        <span class="n">todo_commands</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;qp_commands&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;qp_commands&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="c1"># Extract the list of commands to be executed after the Quantum Package</span>
+        <span class="n">append_commands</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;qp_append&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;qp_append&#39;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="p">[]</span>
+
+        <span class="c1"># Prepend `qp` to the commands from the `parameters[&#39;qp_commands&#39;]` list</span>
+        <span class="n">qp_commands</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;qp </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">todo_commands</span><span class="p">]</span>
+
+        <span class="c1"># OPTIONAL build str with command line options for `qp create_ezfio` (in case StructureData is provided)</span>
+        <span class="k">if</span> <span class="n">QP_INIT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">create_commands</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;A set of qp_create_ezfio commands required upon creation of a new EZFIO database.&#39;</span><span class="p">)</span>
+
+            <span class="n">create_ezfio_command</span> <span class="o">=</span> <span class="s1">&#39;qp create_ezfio&#39;</span>
+            <span class="k">for</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">create_commands</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">create_ezfio_command</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; --</span><span class="si">{</span><span class="n">param</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span>
+
+            <span class="n">create_ezfio_command</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; -- </span><span class="si">{</span><span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;xyz_file&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># ALWAYS build header of the execution script with prepend_commands, e.g. bash</span>
+        <span class="n">input_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;#!/bin/bash&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;set -e&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prepend_commands</span><span class="p">)</span>
+            <span class="p">]</span>
+
+        <span class="c1"># preprocess the wavefunction file</span>
+        <span class="k">if</span> <span class="n">QP_INIT</span><span class="p">:</span>
+            <span class="c1"># create the wavefunction file</span>
+            <span class="n">input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_ezfio_command</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># extract the provided wavefunction file</span>
+            <span class="n">input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;tar -zxf </span><span class="si">{</span><span class="n">input_wf_basename</span><span class="si">}</span><span class="s1">.tar.gz&#39;</span><span class="p">)</span>
+            <span class="n">input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;rm -- </span><span class="si">{</span><span class="n">input_wf_basename</span><span class="si">}</span><span class="s1">.tar.gz&#39;</span><span class="p">)</span>
+
+
+        <span class="c1"># build a block of QP commands to be executed consequently (e.g. qp set_file, qp set, qp run)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">QP_INIT</span><span class="p">:</span>
+            <span class="n">input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qp_commands</span><span class="p">))</span>
+
+        <span class="c1"># run append commands (e.g. additional steps related to qmcchem before archiving</span>
+        <span class="n">input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">append_commands</span><span class="p">))</span>
+
+        <span class="c1"># ALWAYS tar the final wavefunction file to be stored in the data provenance</span>
+        <span class="n">input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;tar -zcf </span><span class="si">{</span><span class="n">output_wf_basename</span><span class="si">}</span><span class="s1">.tar.gz </span><span class="si">{</span><span class="n">output_wf_basename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;rm -rf -- </span><span class="si">{</span><span class="n">output_wf_basename</span><span class="si">}</span><span class="s1">/&#39;</span><span class="p">)</span>
+        <span class="c1"># 2 directories can be produced when exporting to TREXIO, so clean both</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">input_wf_basename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">output_wf_basename</span> <span class="ow">in</span> <span class="n">input_wf_basename</span><span class="p">):</span>
+            <span class="n">input_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;rm -rf -- </span><span class="si">{</span><span class="n">input_wf_basename</span><span class="si">}</span><span class="s1">/&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># the code below is copied from the utils/data_helpers.py of the aiida-cp2k plugin</span>
+<span class="c1"># https://github.com/aiidateam/aiida-cp2k/blob/develop/aiida_cp2k/utils/datatype_helpers.py</span>
+
+<div class="viewcode-block" id="validate_basissets_namespace"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.validate_basissets_namespace">[docs]</a><span class="k">def</span> <span class="nf">validate_basissets_namespace</span><span class="p">(</span><span class="n">basissets</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A input_namespace validator to ensure passed down basis sets have the correct type.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_validate_gdt_namespace</span><span class="p">(</span><span class="n">basissets</span><span class="p">,</span> <span class="n">DataFactory</span><span class="p">(</span><span class="s1">&#39;gaussian.basisset&#39;</span><span class="p">),</span> <span class="s1">&#39;basis set&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="validate_pseudos_namespace"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations.validate_pseudos_namespace">[docs]</a><span class="k">def</span> <span class="nf">validate_pseudos_namespace</span><span class="p">(</span><span class="n">pseudos</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A input_namespace validator to ensure passed down pseudopentials have the correct type.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_validate_gdt_namespace</span><span class="p">(</span><span class="n">pseudos</span><span class="p">,</span> <span class="n">DataFactory</span><span class="p">(</span><span class="s1">&#39;gaussian.pseudo&#39;</span><span class="p">),</span> <span class="s1">&#39;pseudo&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="_validate_gdt_namespace"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations._validate_gdt_namespace">[docs]</a><span class="k">def</span> <span class="nf">_validate_gdt_namespace</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">gdt_cls</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Common namespace validator for both basissets and pseudos&quot;&quot;&quot;</span>
+
+    <span class="n">identifiers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">kind</span><span class="p">,</span> <span class="n">gdt_instance</span> <span class="ow">in</span> <span class="n">_unpack</span><span class="p">(</span><span class="n">entries</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdt_instance</span><span class="p">,</span> <span class="n">gdt_cls</span><span class="p">):</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;invalid </span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2"> for &#39;</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2">&#39; specified&quot;</span>
+
+        <span class="n">identifier</span> <span class="o">=</span> <span class="p">(</span><span class="n">gdt_instance</span><span class="o">.</span><span class="n">element</span><span class="p">,</span> <span class="n">gdt_instance</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="n">identifiers</span><span class="p">:</span>
+            <span class="c1"># note: this should be possible for basissets with different versions</span>
+            <span class="c1">#       but at this point we should require some format for the key to match it</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1"> for kind </span><span class="si">{</span><span class="n">gdt_instance</span><span class="o">.</span><span class="n">element</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">gdt_instance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">) specified multiple times&#39;</span>
+
+        <span class="n">identifiers</span> <span class="o">+=</span> <span class="p">[</span><span class="n">identifier</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="_unpack"><a class="viewcode-back" href="../../apidoc/qp2.html#qp2.calculations._unpack">[docs]</a><span class="k">def</span> <span class="nf">_unpack</span><span class="p">(</span><span class="n">adict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Unpack any lists as values into single elements for the key&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">adict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<span class="c1">#EOF</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022, TREX-CoE. All rights reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

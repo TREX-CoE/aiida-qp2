@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qp2 package &mdash; qp2 0.2.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/contentui.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/contentui.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" type="application/opensearchdescription+xml"
+          title="Search within qp2 0.2.0 documentation"
+          href="../_static/opensearch.xml"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Developer guide" href="../developer_guide/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> qp2
+          </a>
+              <div class="version">
+                0.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/index.html">User guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_guide/index.html">Developer guide</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qp2.calculations">qp2.calculations module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qp2.parsers">qp2.parsers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-qp2">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">qp2</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>qp2 package</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="qp2-package">
+<h1>qp2 package<a class="headerlink" href="#qp2-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-qp2.calculations">
+<span id="qp2-calculations-module"></span><h2>qp2.calculations module<a class="headerlink" href="#module-qp2.calculations" title="Permalink to this headline">¶</a></h2>
+<p>Calculations provided by qp2.</p>
+<p>Register calculations via the “aiida.calculations” entry point in setup.json.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qp2.calculations.</span></span><span class="sig-name descname"><span class="pre">QP2Calculation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.10)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/calculations.html#QP2Calculation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.calculations.QP2Calculation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://aiida.readthedocs.io/projects/aiida-core/en/latest/reference/apidoc/aiida.engine.processes.calcjobs.html#aiida.engine.processes.calcjobs.calcjob.CalcJob" title="(in AiiDA v1.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">aiida.engine.processes.calcjobs.calcjob.CalcJob</span></code></a></p>
+<p>AiiDA calculation plugin wrapping the Quantum Package code.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation.QP_INIT">
+<span class="sig-name descname"><span class="pre">QP_INIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#qp2.calculations.QP2Calculation.QP_INIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation._BASIS_FILE">
+<span class="sig-name descname"><span class="pre">_BASIS_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aiida-basis-set'</span></em><a class="headerlink" href="#qp2.calculations.QP2Calculation._BASIS_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation._INPUT_COORDS_FILE">
+<span class="sig-name descname"><span class="pre">_INPUT_COORDS_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aiida.xyz'</span></em><a class="headerlink" href="#qp2.calculations.QP2Calculation._INPUT_COORDS_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation._INPUT_FILE">
+<span class="sig-name descname"><span class="pre">_INPUT_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aiida.inp'</span></em><a class="headerlink" href="#qp2.calculations.QP2Calculation._INPUT_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation._PSEUDO_FILE">
+<span class="sig-name descname"><span class="pre">_PSEUDO_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aiida-pseudo'</span></em><a class="headerlink" href="#qp2.calculations.QP2Calculation._PSEUDO_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation.__abstractmethods__">
+<span class="sig-name descname"><span class="pre">__abstractmethods__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({})</span></em><a class="headerlink" href="#qp2.calculations.QP2Calculation.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'qp2.calculations'</span></em><a class="headerlink" href="#qp2.calculations.QP2Calculation.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#qp2.calculations.QP2Calculation._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation._render_input_string_from_params">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_render_input_string_from_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_wf_basename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_wf_basename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/calculations.html#QP2Calculation._render_input_string_from_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.calculations.QP2Calculation._render_input_string_from_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the QP submission file based on the contents of the input <cite>parameters</cite> dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation.define">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">define</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/calculations.html#QP2Calculation.define"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.calculations.QP2Calculation.define" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define inputs and outputs of the calculation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qp2.calculations.QP2Calculation.prepare_for_submission">
+<span class="sig-name descname"><span class="pre">prepare_for_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/calculations.html#QP2Calculation.prepare_for_submission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.calculations.QP2Calculation.prepare_for_submission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create input files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>folder</strong> – an <cite>aiida.common.folders.Folder</cite> where the plugin should temporarily place all files
+needed by the calculation.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><cite>aiida.common.datastructures.CalcInfo</cite> instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qp2.calculations._unpack">
+<span class="sig-prename descclassname"><span class="pre">qp2.calculations.</span></span><span class="sig-name descname"><span class="pre">_unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/calculations.html#_unpack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.calculations._unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unpack any lists as values into single elements for the key</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qp2.calculations._validate_gdt_namespace">
+<span class="sig-prename descclassname"><span class="pre">qp2.calculations.</span></span><span class="sig-name descname"><span class="pre">_validate_gdt_namespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdt_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/calculations.html#_validate_gdt_namespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.calculations._validate_gdt_namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common namespace validator for both basissets and pseudos</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qp2.calculations.validate_basissets_namespace">
+<span class="sig-prename descclassname"><span class="pre">qp2.calculations.</span></span><span class="sig-name descname"><span class="pre">validate_basissets_namespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basissets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/calculations.html#validate_basissets_namespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.calculations.validate_basissets_namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>A input_namespace validator to ensure passed down basis sets have the correct type.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="qp2.calculations.validate_pseudos_namespace">
+<span class="sig-prename descclassname"><span class="pre">qp2.calculations.</span></span><span class="sig-name descname"><span class="pre">validate_pseudos_namespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pseudos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/calculations.html#validate_pseudos_namespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.calculations.validate_pseudos_namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p>A input_namespace validator to ensure passed down pseudopentials have the correct type.</p>
+</dd></dl>
+
+</section>
+<section id="module-qp2.parsers">
+<span id="qp2-parsers-module"></span><h2>qp2.parsers module<a class="headerlink" href="#module-qp2.parsers" title="Permalink to this headline">¶</a></h2>
+<p>Parsers provided by qp2.</p>
+<p>Register parsers via the “aiida.parsers” entry point in setup.json.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="qp2.parsers.QP2Parser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qp2.parsers.</span></span><span class="sig-name descname"><span class="pre">QP2Parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/parsers.html#QP2Parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.parsers.QP2Parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://aiida.readthedocs.io/projects/aiida-core/en/latest/reference/apidoc/aiida.parsers.html#aiida.parsers.parser.Parser" title="(in AiiDA v1.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">aiida.parsers.parser.Parser</span></code></a></p>
+<p>Parser class for parsing output of calculation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.parsers.QP2Parser.__abstractmethods__">
+<span class="sig-name descname"><span class="pre">__abstractmethods__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">frozenset({})</span></em><a class="headerlink" href="#qp2.parsers.QP2Parser.__abstractmethods__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qp2.parsers.QP2Parser.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/parsers.html#QP2Parser.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.parsers.QP2Parser.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize Parser instance</p>
+<p>Checks that the ProcessNode being passed was produced by a QP2Calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.10)"><em>type</em></a>) – ProcessNode of calculation</p></li>
+<li><p><strong>node</strong> – <a class="reference external" href="https://aiida.readthedocs.io/projects/aiida-core/en/latest/reference/apidoc/aiida.orm.html#aiida.orm.ProcessNode" title="(in AiiDA v1.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">aiida.orm.ProcessNode</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.parsers.QP2Parser.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'qp2.parsers'</span></em><a class="headerlink" href="#qp2.parsers.QP2Parser.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qp2.parsers.QP2Parser._abc_impl">
+<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#qp2.parsers.QP2Parser._abc_impl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qp2.parsers.QP2Parser.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/qp2/parsers.html#QP2Parser.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qp2.parsers.QP2Parser.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse outputs, store results in database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>an exit code, if parsing fails (or nothing if parsing succeeds)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-qp2">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-qp2" title="Permalink to this headline">¶</a></h2>
+<p>qp2</p>
+<p>AiiDA plugin for the Quanum Package 2.0</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../developer_guide/index.html" class="btn btn-neutral float-left" title="Developer guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022, TREX-CoE. All rights reserved.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

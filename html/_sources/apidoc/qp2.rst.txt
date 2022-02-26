@@ -1,0 +1,35 @@
+qp2 package
+===========
+
+Submodules
+----------
+
+qp2.calculations module
+-----------------------
+
+.. automodule:: qp2.calculations
+   :members:
+   :special-members:
+   :private-members:
+   :undoc-members:
+   :show-inheritance:
+
+qp2.parsers module
+------------------
+
+.. automodule:: qp2.parsers
+   :members:
+   :special-members:
+   :private-members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: qp2
+   :members:
+   :special-members:
+   :private-members:
+   :undoc-members:
+   :show-inheritance:
