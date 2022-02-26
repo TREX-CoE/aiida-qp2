@@ -14,17 +14,17 @@ intended to help developers get started with their AiiDA plugins.
 * [`qp2/`](qp2/): The main source code of the plugin package
   * [`calculations.py`](qp2/calculations.py): A new `QP2Calculation` `CalcJob` class
   * [`parsers.py`](qp2/parsers.py): A new `Parser` for the `QP2Calculation`
-* [`docs/`](docs/): A documentation template.
+* [`docs/`](docs/): A documentation template. The [ReadTheDocs documentation](https://trex-coe.github.io/aiida-qp2/) is built and deployed on the `gh-pages` branch.
 * [`examples/`](examples/): Examples of how to submit a calculation using this plugin
-* [`.github/`](.github/): [Github Actions](https://github.com/features/actions) configuration
-  * [`ci.yml`](.github/workflows/ci.yml): runs tests and builds documentation at every new commit
-  * [`publish-on-pypi.yml`](.github/workflows/publish-on-pypi.yml): automatically deploy git tags to PyPI
-* [`.pre-commit-config.yaml`](.pre-commit-config.yaml): Configuration of [pre-commit hooks](https://pre-commit.com/) that sanitize coding style and check for syntax errors. Enable via `pip install -e .[pre-commit] && pre-commit install`
 * [`LICENSE`](LICENSE): License for your plugin
 * [`MANIFEST.in`](MANIFEST.in): Configure non-Python files to be included for publication on [PyPI](https://pypi.org/)
 * [`README.md`](README.md): This file
 * [`setup.json`](setup.json): Plugin metadata for registration on [PyPI](https://pypi.org/) and the [AiiDA plugin registry](https://aiidateam.github.io/aiida-registry/) (including entry points)
 * [`setup.py`](setup.py): Installation script for pip / [PyPI](https://pypi.org/)
+* [`.pre-commit-config.yaml`](.pre-commit-config.yaml): Configuration of [pre-commit hooks](https://pre-commit.com/) that sanitize coding style and check for syntax errors. Enable via `pip install -e .[pre-commit] && pre-commit install`
+* [`.github/`](.github/): [Github Actions](https://github.com/features/actions) configuration
+  * [`ci.yml`](.github/workflows/ci.yml): runs tests and builds documentation at every new commit
+  * [`publish-on-pypi.yml`](.github/workflows/publish-on-pypi.yml): automatically deploy git tags to PyPI
 
 
 ## Features
