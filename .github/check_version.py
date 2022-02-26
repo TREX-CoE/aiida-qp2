@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Check that version numbers match.
 
-Check version number in setup.json and qp2/__init__.py and make sure
+Check version number in setup.json and aiida_qp2/__init__.py and make sure
 they match.
 """
 from __future__ import absolute_import
@@ -20,15 +20,16 @@ with open(SETUP_PATH) as f:
 
 # Get version from python package
 sys.path.insert(0, os.path.join(this_path, os.pardir))
-import qp2  # pylint: disable=wrong-import-position
+import aiida_qp2  # pylint: disable=wrong-import-position
 
-VERSION = qp2.__version__
+VERSION = aiida_qp2.__version__
 
 if VERSION != setup_content['version']:
     print('Version number mismatch detected:')
     print("Version number in '{}': {}".format(SETUP_FNAME,
                                               setup_content['version']))
-    print("Version number in '{}/__init__.py': {}".format('qp2', VERSION))
+    print("Version number in '{}/__init__.py': {}".format(
+        'aiida_qp2', VERSION))
     sys.exit(1)
 
 # Overwrite version in setup.json

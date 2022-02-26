@@ -9,7 +9,7 @@ if __name__ == '__main__':
     with open('setup.json', 'r') as info:
         kwargs = json.load(info)
     setup(
-        packages=find_packages(include=['qp2', 'qp2.*']),
+        packages=find_packages(include=['aiida_qp2', 'aiida_qp2.*']),
         # this doesn't work when placed in setup.json (something to do with str type)
         package_data={
             '': ['*'],
