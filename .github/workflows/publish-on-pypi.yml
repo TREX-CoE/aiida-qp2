@@ -9,7 +9,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: github.repository == 'q-posev/aiida-qp2' && startsWith(github.ref, 'refs/tags/v')
+    if: github.repository == 'TREX-CoE/aiida-qp2' && startsWith(github.ref, 'refs/tags/v')
 
     steps:
     - name: Checkout repository
@@ -22,7 +22,7 @@ jobs:
 
     - name: Upgrade setuptools and install package
       run: |
-        python -m pip install --upgrade pip setuptools
+        python -m pip install --upgrade pip setuptools build
         python -m pip install -e .
 
     - name: Assert package version
@@ -31,10 +31,13 @@ jobs:
       run: python ./.github/check_version.py
 
     - name: Build source distribution
-      run: python ./setup.py sdist
+      run: python -m build --sdist --outdir dist/ .
 
-    - name: Publish package to PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.pypi_token }}
+    - name: List the contents
+      run: ls
+
+      # DO THE PYPI_API_TOKEN ONCE THE PERMISSION IS GIVEN !
+      #   - name: Publish package to PyPI
+      #     uses: pypa/gh-action-pypi-publish@master
+      #     with:
+      #       password: ${{ secrets.PYPI_API_TOKEN }}
