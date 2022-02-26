@@ -12,7 +12,7 @@
         "License :: OSI Approved :: MIT License",
         "Framework :: AiiDA"
     ],
-    "version": "0.2.0",
+    "version": "0.3.0",
     "entry_points": {
         "aiida.calculations": [
             "qp2 = aiida_qp2.calculations:QP2Calculation"
