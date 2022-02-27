@@ -86,7 +86,7 @@
              
   <section id="getting-started">
 <h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>This page should contain a short guide on what the plugin does and
+<p>This page contains a short guide on what the plugin does and
 a short example on how to use the plugin.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
@@ -94,21 +94,21 @@ a short example on how to use the plugin.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">TREX</span><span class="o">-</span><span class="n">CoE</span><span class="o">/</span><span class="n">aiida</span><span class="o">-</span><span class="n">qp2</span> <span class="o">.</span>
 <span class="n">cd</span> <span class="n">aiida</span><span class="o">-</span><span class="n">qp2</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span>  <span class="c1"># also installs aiida, if missing (but not postgres)</span>
-<span class="c1">#pip install -e .[pre-commit,testing] # install extras for more features</span>
+<span class="c1">#pip install -e .[pre-commit,testing]  # install extras for more features</span>
+<span class="c1">#pre-commit install  # install pre-commit hooks</span>
 <span class="n">verdi</span> <span class="n">quicksetup</span>  <span class="c1"># better to set up a new profile</span>
-<span class="n">verdi</span> <span class="n">calculation</span> <span class="n">plugins</span>  <span class="c1"># should now show your calclulation plugins</span>
+<span class="n">verdi</span> <span class="n">plugin</span> <span class="nb">list</span> <span class="n">aiida</span><span class="o">.</span><span class="n">calculations</span>  <span class="c1"># should now show your calclulation plugins</span>
 </pre></div>
 </div>
-<p>Then use <code class="docutils literal notranslate"><span class="pre">verdi</span> <span class="pre">code</span> <span class="pre">setup</span></code> with the <code class="docutils literal notranslate"><span class="pre">qp2</span></code> input plugin
-to set up an AiiDA code for qp2.</p>
+<p>Then use <code class="docutils literal notranslate"><span class="pre">verdi</span> <span class="pre">code</span> <span class="pre">setup</span></code> to set up an AiiDA code for qp2.</p>
 </section>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>A quick demo of how to submit a calculation:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">verdi</span> <span class="n">daemon</span> <span class="n">start</span>         <span class="c1"># make sure the daemon is running</span>
 <span class="n">cd</span> <span class="n">examples</span>
-<span class="n">verdi</span> <span class="n">run</span> <span class="n">test_submit</span><span class="o">.</span><span class="n">py</span>        <span class="c1"># submit test calculation</span>
-<span class="n">verdi</span> <span class="n">calculation</span> <span class="nb">list</span> <span class="o">-</span><span class="n">a</span>  <span class="c1"># check status of calculation</span>
+<span class="n">verdi</span> <span class="n">run</span> <span class="n">example_ezfio_from_gdt</span><span class="o">.</span><span class="n">py</span>        <span class="c1"># submit an example calculation</span>
+<span class="n">verdi</span> <span class="n">process</span> <span class="nb">list</span> <span class="o">-</span><span class="n">a</span>  <span class="c1"># check status of the calculation</span>
 </pre></div>
 </div>
 </section>

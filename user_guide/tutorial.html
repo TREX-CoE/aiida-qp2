@@ -50,8 +50,8 @@
 <li class="toctree-l2"><a class="reference internal" href="get_started.html">Getting started</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorial</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#what-we-want-to-achieve">What we want to achieve</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#step-1">Step 1</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#step-2">Step 2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#initialize-the-wave-function-file">Initialize the wave function file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#perform-calculations">Perform calculations</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#the-final-result">The final result</a></li>
@@ -89,21 +89,88 @@
              
   <section id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<p>This page can contain a simple tutorial for your code.</p>
+<p>This page contains a simple tutorial for <code class="docutils literal notranslate"><span class="pre">aiida-qp2</span></code> plugin.</p>
 <section id="what-we-want-to-achieve">
 <h2>What we want to achieve<a class="headerlink" href="#what-we-want-to-achieve" title="Permalink to this headline">¶</a></h2>
-<section id="step-1">
-<h3>Step 1<a class="headerlink" href="#step-1" title="Permalink to this headline">¶</a></h3>
-<p>Some text</p>
+<section id="initialize-the-wave-function-file">
+<h3>Initialize the wave function file<a class="headerlink" href="#initialize-the-wave-function-file" title="Permalink to this headline">¶</a></h3>
+<p>Create an EZFIO <code class="docutils literal notranslate"><span class="pre">SinglefileData</span></code> node from the existing <code class="docutils literal notranslate"><span class="pre">StructureData</span></code> instance using <code class="docutils literal notranslate"><span class="pre">qp_create_ezfio</span></code> dictionary:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load the required AiiDA modules</span>
+<span class="kn">from</span> <span class="nn">aiida</span> <span class="kn">import</span> <span class="n">orm</span><span class="p">,</span> <span class="n">engine</span>
+<span class="kn">from</span> <span class="nn">aiida.common.exceptions</span> <span class="kn">import</span> <span class="n">NotExistent</span>
+
+<span class="c1"># QP-related parameters</span>
+<span class="n">ezfio_basename</span> <span class="o">=</span> <span class="s1">&#39;hcn.ezfio&#39;</span>
+<span class="n">create_parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;qp_create_ezfio&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;basis&#39;</span>  <span class="p">:</span> <span class="s1">&#39;&quot;6-31g&quot;&#39;</span><span class="p">,</span>      <span class="c1"># QP-native basis set</span>
+        <span class="s1">&#39;charge&#39;</span> <span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;output&#39;</span> <span class="p">:</span> <span class="n">ezfio_basename</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1"># AiiDA-related parameters</span>
+
+<span class="c1"># Load the code</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">load_code</span><span class="p">(</span><span class="s1">&#39;qp@localost&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Create the qp2 code&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">NotExistent</span>
+
+<span class="c1"># Build the calculation</span>
+<span class="n">builder</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">get_builder</span><span class="p">()</span>
+
+<span class="c1"># Replace &lt;StructureData_name&gt; with the name of your StructureData object</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">load_node</span><span class="p">(</span><span class="n">pk</span><span class="o">=&lt;</span><span class="n">StructureData_name</span><span class="o">&gt;.</span><span class="n">pk</span><span class="p">)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">structure</span> <span class="o">=</span> <span class="n">structure</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">Dict</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="n">create_parameters</span><span class="p">)</span>
+<span class="c1"># EZFIO directory name (to be tar.gz-ed)</span>
+<span class="n">builder</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output_wf_basename</span> <span class="o">=</span> <span class="n">ezfio_basename</span>
+
+<span class="c1"># Run the calculation &amp; parse the results</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">builder</span><span class="p">)</span>
+
+<span class="c1"># Print the name of the output wave function (EZFIO) file</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;EZFIO SinglefileData name   : &#39;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;output_wavefunction&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note: it is possible to create a <code class="docutils literal notranslate"><span class="pre">StructureData</span></code> node from the XYZ atomic configuration file. For example, using the <code class="docutils literal notranslate"><span class="pre">Molecule</span></code> class of the <code class="docutils literal notranslate"><span class="pre">pymatgen</span></code> package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pymatgen.core</span> <span class="kn">import</span> <span class="n">Molecule</span>
+<span class="n">mol</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s1">&#39;hcn.xyz&#39;</span><span class="p">)</span>
+<span class="n">structure</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">StructureData</span><span class="p">(</span><span class="n">pymatgen_molecule</span><span class="o">=</span><span class="n">mol</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
-<section id="step-2">
-<h3>Step 2<a class="headerlink" href="#step-2" title="Permalink to this headline">¶</a></h3>
-<p>Some other text</p>
+<section id="perform-calculations">
+<h3>Perform calculations<a class="headerlink" href="#perform-calculations" title="Permalink to this headline">¶</a></h3>
+<p>Use the previously created wave function file to run SCF (or any other type of QP-supported) calculation according to the <code class="docutils literal notranslate"><span class="pre">qp_commands</span></code> list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># QP-related parameters</span>
+<span class="n">calc_parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;qp_commands&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s1">&#39;set_file </span><span class="si">{</span><span class="n">ezfio_basename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;run scf&#39;</span>
+        <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="c1"># AiiDA-related parameters</span>
+<span class="n">builder_scf</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">get_builder</span><span class="p">()</span>
+
+<span class="n">builder_scf</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">orm</span><span class="o">.</span><span class="n">Dict</span><span class="p">(</span><span class="nb">dict</span><span class="o">=</span><span class="n">calc_parameters</span><span class="p">)</span>
+<span class="n">builder_scf</span><span class="o">.</span><span class="n">wavefunction</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;output_wavefunction&#39;</span><span class="p">]</span>
+<span class="n">builder_scf</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">output_wf_basename</span> <span class="o">=</span> <span class="n">ezfio_basename</span>
+
+<span class="c1"># Run the calculation &amp; parse the results</span>
+<span class="n">result_scf</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">builder_scf</span><span class="p">)</span>
+
+<span class="c1"># Print the computed SCF energy</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SCF energy (Hartree)        : &#39;</span><span class="p">,</span> <span class="n">result_scf</span><span class="p">[</span><span class="s1">&#39;output_energy&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
 </section>
 </section>
 <section id="the-final-result">
 <h2>The final result<a class="headerlink" href="#the-final-result" title="Permalink to this headline">¶</a></h2>
-<p>Some text</p>
+<p>You have created a wave function file using parameters provided in <code class="docutils literal notranslate"><span class="pre">qp_create_ezfio</span></code> dict. You have then computed the SCF energy with Quantum Package via the <code class="docutils literal notranslate"><span class="pre">aiida-qp2</span></code> plugin using the <code class="docutils literal notranslate"><span class="pre">qp_commands</span></code> list. All input and output nodes have been stored in the data provenance and can be queried for.</p>
 </section>
 </section>
 

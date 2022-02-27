@@ -84,11 +84,6 @@
 <h1>Developer guide<a class="headerlink" href="#developer-guide" title="Permalink to this headline">¶</a></h1>
 <section id="running-the-tests">
 <h2>Running the tests<a class="headerlink" href="#running-the-tests" title="Permalink to this headline">¶</a></h2>
-<p>The following will discover and run all unit test:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">testing</span><span class="p">]</span>
-<span class="n">pytest</span> <span class="o">-</span><span class="n">v</span>
-</pre></div>
-</div>
 </section>
 <section id="automatic-coding-style-checks">
 <h2>Automatic coding style checks<a class="headerlink" href="#automatic-coding-style-checks" title="Permalink to this headline">¶</a></h2>
@@ -110,7 +105,6 @@ run at every commit.</p>
 <h2>Continuous integration<a class="headerlink" href="#continuous-integration" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">aiida_qp2</span></code> comes with a <code class="docutils literal notranslate"><span class="pre">.github</span></code> folder that contains continuous integration tests on every commit using <a class="reference external" href="https://github.com/features/actions">GitHub Actions</a>. It will:</p>
 <ol class="arabic simple">
-<li><p>run all tests for the <code class="docutils literal notranslate"><span class="pre">django</span></code> ORM</p></li>
 <li><p>build the documentation</p></li>
 <li><p>check coding style and version number (not required to pass by default)</p></li>
 </ol>
