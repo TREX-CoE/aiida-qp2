@@ -15,10 +15,6 @@ The aiida-qp2 plugin for `AiiDA`_
    developer_guide/index
    API documentation <apidoc/aiida_qp2>
 
-If you use this plugin for your research, please cite the following work:
-
-.. highlights:: Author Name1, Author Name2, *Paper title*, Jornal Name XXX, YYYY (Year).
-
 If you use AiiDA for your research, please cite the following work:
 
 .. highlights:: Giovanni Pizzi, Andrea Cepellotti, Riccardo Sabatini, Nicola Marzari,
