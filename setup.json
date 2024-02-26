@@ -19,7 +19,8 @@
             "qp2.create = aiida_qp2.create.calulation:QP2CreateCalculation"
         ],
         "aiida.parsers": [
-            "qp2 = aiida_qp2.parsers:QP2Parser"
+            "qp2 = aiida_qp2.parsers:QP2Parser",
+	    "qp2.create = aiida_qp2.create.parsers:QP2CreateParser"
         ]
     },
     "include_package_data": true,
