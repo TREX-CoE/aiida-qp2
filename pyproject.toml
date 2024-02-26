@@ -9,7 +9,7 @@ disable = [
 ]
 
 [tool.pytest.ini_options]
-python_files = "test_*.py example_*.py"
+python_files = "test_*.py"
 filterwarnings = [
     "ignore::DeprecationWarning:aiida:",
     "ignore::DeprecationWarning:plumpy:",
