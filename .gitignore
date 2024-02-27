@@ -3,13 +3,14 @@
 *.swp
 ~*
 *~
-.project
 *.egg*
-.DS_Store
+.configs
 .coverage
+.DS_Store
+.project
 .pytest_cache
 .vscode
 build/
 dist/
-pip-wheel-metadata/
 examples/*.pdf
+pip-wheel-metadata/
