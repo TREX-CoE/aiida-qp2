@@ -4,13 +4,13 @@
 ~*
 *~
 *.egg*
-.configs
 .coverage
 .DS_Store
 .project
 .pytest_cache
 .vscode
 build/
+configs/
 dist/
 examples/*.pdf
 pip-wheel-metadata/
