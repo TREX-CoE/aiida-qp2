@@ -14,13 +14,18 @@
     ],
     "version": "0.3.0",
     "entry_points": {
+	"aiida.cmdline.data": [
+	    "qp2.cli = aiida_qp2.cli:smart"
+        ],
         "aiida.calculations": [
             "qp2 = aiida_qp2.calculations:QP2Calculation",
-            "qp.create = aiida_qp2.create.calculation:QP2CreateCalculation"
+            "qp2.create = aiida_qp2.create.calculation:QP2CreateCalculation",
+            "qp2.run = aiida_qp2.run.calculation:QP2RunCalculation"
         ],
         "aiida.parsers": [
             "qp2 = aiida_qp2.parsers:QP2Parser",
-	    "qp.create = aiida_qp2.create.parser:QP2CreateParser"
+	    "qp2.create = aiida_qp2.create.parser:QP2CreateParser",
+	    "qp2.run = aiida_qp2.run.parser:QP2RunParser"
         ]
     },
     "include_package_data": true,
