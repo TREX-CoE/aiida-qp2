@@ -195,7 +195,7 @@ def deactivate():
 @code_option
 @wf_option
 @click.option("--dry-run", is_flag=True, help="Do not run the operation")
-@click.option("--do-not-store-wf, -d", is_flag=True, help="Do not store the wavefunction")
+@click.option("--do-not-store-wf", is_flag=True, help="Do not store the wavefunction")
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @decorators.with_dbenv()
 def run(operation, code, wavefunction, dry_run, do_not_store_wf, args):
@@ -221,12 +221,13 @@ def run(operation, code, wavefunction, dry_run, do_not_store_wf, args):
 
     Calc = CalculationFactory("qp2.run")
 
-    inputs = {"wavefunction": wavefunction,
-              "code": code,
-              "parameters": Dict(dict={"run_type": operation,
-                                       "qp_append": "".join(args)}) }
+    builder = Calc.get_builder()
+    builder.wavefunction = wavefunction
+    builder.code = code
+    builder.parameters = Dict(dict={"run_type": operation,
+                                    "qp_append": "".join(args)})
 
-    calc = Calc(inputs=inputs)
+    builder.metadata.options.store_wavefunction = not do_not_store_wf
 
     from aiida.engine import run
 
@@ -234,7 +235,7 @@ def run(operation, code, wavefunction, dry_run, do_not_store_wf, args):
         echo.echo("Dry run, not running the operation")
         return
 
-    ret = run(calc)
+    ret = run(builder)
 
     if "output_energy" in ret:
         echo.echo(f"Energy: {ret['output_energy'].value}")
