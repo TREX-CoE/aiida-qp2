@@ -47,6 +47,8 @@ class QP2RunParser(Parser):
         output_wf_basename = self.node.get_option(
             'output_wf_basename')
         output_wf_filename = output_wf_basename + '.tar.gz'
+        store_wavefunction = self.node.get_option(
+            'store_wavefunction')
 
         run_type = self.node.inputs.parameters.get_dict().get('run_type')
 
@@ -77,12 +79,13 @@ class QP2RunParser(Parser):
         else:
             energy = self._json_reader(out_folder)
 
-        # Store the wavefunction file
-        with out_folder.open(output_wf_filename, 'rb') as handle:
-            wf_file = SinglefileData(file=handle)
+        if store_wavefunction:
+            # Store the wavefunction file
+            with out_folder.open(output_wf_filename, 'rb') as handle:
+                wf_file = SinglefileData(file=handle)
 
-        wf_file.base.attributes.set("wavefunction", True)
-        self.out('output_wavefunction', wf_file)
+            wf_file.base.attributes.set("wavefunction", True)
+            self.out('output_wavefunction', wf_file)
 
     def _json_reader(self, out_folder):
         # List aiida.wf/json/

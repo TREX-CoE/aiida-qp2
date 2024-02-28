@@ -194,9 +194,11 @@ def deactivate():
 @click.argument("operation", type=click.STRING)
 @code_option
 @wf_option
+@click.option("--dry-run", is_flag=True, help="Do not run the operation")
+@click.option("--do-not-store-wf, -d", is_flag=True, help="Do not store the wavefunction")
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @decorators.with_dbenv()
-def run(operation, code, wavefunction, args):
+def run(operation, code, wavefunction, dry_run, do_not_store_wf, args):
     """Run a pq2 operation"""
 
     echo.echo(f"Running operation {operation} ...")
@@ -227,6 +229,10 @@ def run(operation, code, wavefunction, args):
     calc = Calc(inputs=inputs)
 
     from aiida.engine import run
+
+    if dry_run:
+        echo.echo("Dry run, not running the operation")
+        return
 
     ret = run(calc)
 

@@ -35,18 +35,35 @@ class QP2RunCalculation(CalcJob):
         # Set default values for AiiDA options
 
         # Dictionary of parameters, supported: qp_create_ezfio, qp_commands, qp_prepend, qp_append
-        spec.input('parameters', valid_type=Dict, required=True,
-                help='Calculation parameters to be specified in the input file.')
+        spec.input('parameters',
+                   valid_type=Dict,
+                   required=True,
+                   help='Calculation parameters to be specified in the input file.')
 
-        spec.input('wavefunction', valid_type=SinglefileData, required=False, help='The wavefunction file (EZFIO or TREXIO).')
+        spec.input('wavefunction',
+                   valid_type=SinglefileData,
+                   required=False,
+                   help='The wavefunction file (EZFIO or TREXIO).')
 
-        spec.input('code', valid_type=Code, required=False, help='The `Code` to use for this job.')
+        spec.input('code',
+                   valid_type=Code,
+                   required=False,
+                   help='The `Code` to use for this job.')
 
         # Output wavefunction base name
-        spec.input('metadata.options.output_wf_basename', valid_type=str, required=True, default='aiida.wf',
-                help='Base name of the output wavefunction file (without .tar.gz or .h5).')
+        spec.input('metadata.options.output_wf_basename',
+                   valid_type=str,
+                   required=True,
+                   default='aiida.wf',
+                   help='Base name of the output wavefunction file (without .tar.gz or .h5).')
 
-        spec.input('metadata.options.output_filename', valid_type=str, default='aiida-qp2.out')
+        spec.input('metadata.options.output_filename',
+                   valid_type=str,
+                   default='aiida-qp2.out')
+
+        spec.input('metadata.options.store_wavefunction',
+                   valid_type=bool,
+                   default=True)
 
         spec.inputs['metadata']['options']['parser_name'].default = 'qp2.run'
 
@@ -60,7 +77,7 @@ class QP2RunCalculation(CalcJob):
         spec.output('output_energy', valid_type=Float, required=False, help='The result of the calculation')
         spec.output_node = 'output_energy'
 
-        spec.output('output_wavefunction', valid_type=SinglefileData, required=True,
+        spec.output('output_wavefunction', valid_type=SinglefileData, required=False,
                     help='The wave function file (EZFIO or TREXIO)')
         spec.output_node = 'output_wavefunction'
 
