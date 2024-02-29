@@ -195,10 +195,12 @@ def deactivate():
 @code_option
 @wf_option
 @click.option("--dry-run", is_flag=True, help="Do not run the operation")
+@click.option("--prepend", "-p", type=click.STRING, multiple=True, help="Prepend to qp2 input")
 @click.option("--do-not-store-wf", is_flag=True, help="Do not store the wavefunction")
+@click.option("--trexio-bug-fix", is_flag=True, help="Fix bug where full path has to by specified in trexio_file")
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @decorators.with_dbenv()
-def run(operation, code, wavefunction, dry_run, do_not_store_wf, args):
+def run(operation, code, wavefunction, dry_run, prepend, do_not_store_wf, trexio_bug_fix, args):
     """Run a pq2 operation"""
 
     echo.echo(f"Running operation {operation} ...")
@@ -225,6 +227,8 @@ def run(operation, code, wavefunction, dry_run, do_not_store_wf, args):
     builder.wavefunction = wavefunction
     builder.code = code
     builder.parameters = Dict(dict={"run_type": operation,
+                                    "trexio_bug_fix": trexio_bug_fix,
+                                    "qp_prepend": prepend,
                                     "qp_append": "".join(args)})
 
     builder.metadata.options.store_wavefunction = not do_not_store_wf
@@ -238,11 +242,12 @@ def run(operation, code, wavefunction, dry_run, do_not_store_wf, args):
     ret = run(builder)
 
     if "output_energy" in ret:
-        echo.echo(f"Energy: {ret['output_energy'].value}")
+        energy_msg = f"Energy: {ret['output_energy'].value}"
+        if "output_energy_error" in ret:
+            energy_msg += f" +/- {ret['output_energy_error'].value}"
+        echo.echo(f"{energy_msg}")
         echo.echo("")
         echo.echo_success(f"Operation {operation} completed")
-    else:
-        echo.echo_critical(f"Operation {operation} failed")
 
 @smart.command("show")
 @decorators.with_dbenv()

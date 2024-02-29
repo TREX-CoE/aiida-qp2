@@ -4,6 +4,7 @@ Parsers provided by qp2.
 
 """
 
+import re
 from os.path import join as path_join
 
 from aiida.engine import ExitCode
@@ -42,15 +43,29 @@ class QP2RunParser(Parser):
 
         :returns: an exit code, if parsing fails (or nothing if parsing succeeds)
         """
+
         output_filename = self.node.get_option(
             'output_filename')
+
+        run_type = self.node.inputs.parameters.get_dict().get('run_type')
+
+        with self.retrieved.open(output_filename, 'r') as handle:
+            regex = re.compile(r"ERROR CODE: (\d+)")
+            for line in handle:
+                match = regex.match(line)
+                if match:
+                    return ExitCode(350 + int(match.group(1)))
+
+        # First check if it is not a qmcchem run
+        if run_type == 'qmcchem':
+            return self.parse_qmcchem()
+
         output_wf_basename = self.node.get_option(
             'output_wf_basename')
         output_wf_filename = output_wf_basename + '.tar.gz'
         store_wavefunction = self.node.get_option(
             'store_wavefunction')
 
-        run_type = self.node.inputs.parameters.get_dict().get('run_type')
 
         try:
             out_folder = self.retrieved
@@ -78,6 +93,58 @@ class QP2RunParser(Parser):
                     self.out('output_energy', Float(float(f_out.read())))
         else:
             energy = self._json_reader(out_folder)
+
+        if store_wavefunction:
+            # Store the wavefunction file
+            with out_folder.open(output_wf_filename, 'rb') as handle:
+                wf_file = SinglefileData(file=handle)
+
+            wf_file.base.attributes.set("wavefunction", True)
+            self.out('output_wavefunction', wf_file)
+
+    def parse_qmcchem(self, **kwargs):
+
+        output_filename = self.node.get_option(
+            'output_filename')
+        output_wf_basename = self.node.get_option(
+            'output_wf_basename')
+        output_wf_filename = output_wf_basename + '.tar.gz'
+        store_wavefunction = self.node.get_option(
+            'store_wavefunction')
+
+        try:
+            out_folder = self.retrieved
+        except exceptions.NotExistent:
+            return self.exit_codes.ERROR_NO_RETRIEVED_FOLDER
+
+        files_retrieved = self.retrieved.list_object_names()
+        files_expected = [output_filename, output_wf_filename]
+
+        if not set(files_expected) <= set(files_retrieved):
+            self.logger.error("Found files '{}', expected to find '{}'".format(
+                files_retrieved, files_expected))
+            return self.exit_codes.ERROR_MISSING_OUTPUT_FILES
+
+        energy = None
+        energy_err = None
+        energy_qmcvar = None
+        energy_qmcvar_err = None
+        with out_folder.open(output_filename, 'r') as handle:
+            for line in handle:
+                if "          E_loc :" in line:
+                    energy = float(line.split()[2])
+                    energy_err = float(line.split()[4])
+                if "   E_loc_qmcvar :" in line:
+                    energy_qmcvar = float(line.split()[2])
+                    energy_qmcvar_err = float(line.split()[4])
+        if energy:
+            self.out('output_energy', Float(energy))
+        if energy_err:
+            self.out('output_energy_error', Float(energy_err))
+        if energy_qmcvar:
+            self.out('output_energy_stddev', Float(energy_qmcvar))
+        if energy_qmcvar_err:
+            self.out('output_energy_stddev_error', Float(energy_qmcvar_err))
 
         if store_wavefunction:
             # Store the wavefunction file
