@@ -102,3 +102,26 @@ verdi data qp2.cli show # Look at the results
 
 I wrote these command from head hopefully there are no mistakes.
 
+## Runnin QMC=Chem
+
+Pull `QMC=Chem` docker image
+
+```
+docker pull addman151/qmcchem-aiida
+```
+
+You can install this code in the same way how the qp code was installed. In fact this image contain also `qp` so you can you this image also for previous calculations.
+
+Recomended workflow follows:
+
+```
+verdi data qp2.cli run save_for_qmcchem --trexio-bug-fix
+```
+
+The option `--trexio-bug-fix` is there because there is a bug where one has to manually put absolute path to the trexio file. This flag will fix it.
+
+Now run `QMC=Chem`:
+
+```
+verdi data qp2.cli run qmcchem -p "-t 1800" -p "-l 20"
+```

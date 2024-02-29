@@ -24,7 +24,6 @@ class QP2RunCalculation(CalcJob):
     _INPUT_COORDS_FILE = 'aiida.xyz'
     _BASIS_FILE = 'aiida-basis-set'
     _PSEUDO_FILE = 'aiida-pseudo'
-    QP_INIT = False
 
     @classmethod
     def define(cls, spec):
@@ -34,7 +33,6 @@ class QP2RunCalculation(CalcJob):
 
         # Set default values for AiiDA options
 
-        # Dictionary of parameters, supported: qp_create_ezfio, qp_commands, qp_prepend, qp_append
         spec.input('parameters',
                    valid_type=Dict,
                    required=True,
@@ -74,8 +72,29 @@ class QP2RunCalculation(CalcJob):
         }
 
         # Output parameters
-        spec.output('output_energy', valid_type=Float, required=False, help='The result of the calculation')
+        spec.output('output_energy',
+                    valid_type=Float,
+                    required=False,
+                    help='The result of the calculation')
         spec.output_node = 'output_energy'
+
+        spec.output('output_energy_error',
+                    valid_type=Float,
+                    required=False,
+                    help='The error of the energy calculation')
+        spec.output_node = 'output_energy_error'
+
+        spec.output('output_energy_stddev',
+                    valid_type=Float,
+                    required=False,
+                    help='The standard deviation of the energy calculation')
+        spec.output_node = 'output_energy_stddev'
+
+        spec.output('output_energy_stddev_error',
+                    valid_type=Float,
+                    required=False,
+                    help='The error of the standard deviation calculation')
+        spec.output_node = 'output_energy_stddev_error'
 
         spec.output('output_wavefunction', valid_type=SinglefileData, required=False,
                     help='The wave function file (EZFIO or TREXIO)')
@@ -90,6 +109,7 @@ class QP2RunCalculation(CalcJob):
             needed by the calculation.
         :return: `aiida.common.datastructures.CalcInfo` instance
         """
+
 
         with folder.open(self._INPUT_FILE, 'w') as handle:
             self._write_input_file(handle)
@@ -120,8 +140,23 @@ class QP2RunCalculation(CalcJob):
         """Write the input file to the handle"""
         # yapf: disable
 
-        run_type = self.inputs.parameters.get_dict()['run_type']
+        run_type = self.inputs.parameters.get_dict().get('run_type', 'none')
+        tbf = self.inputs.parameters.get_dict().get('trexio_bug_fix', False)
         append = self.inputs.parameters.get_dict().get('qp_append', '')
+
+        if run_type == "none":
+            raise ValueError("run_type not specified in parameters")
+
+        code_command = "qp"
+        config_commad = "set"
+        run_command = f"qp run {run_type} {append}"
+        ezfio = ""
+
+        if run_type == "qmcchem":
+            code_command = "qmcchem"
+            config_command = "edit"
+            run_command = "qmcchem run aiida.ezfio"
+            ezfio = "aiida.ezfio"
 
         handle.write("#!/bin/bash\n")
         handle.write("set -e\n")
@@ -130,9 +165,14 @@ class QP2RunCalculation(CalcJob):
 
         # Iter over prepend parameters
         if self.inputs.parameters.get_dict().get('qp_prepend', None):
-            for key, value in self.inputs.parameters.get_dict().get('qp_prepend'):
-                handle.write(f"qp set {key} {value}\n")
+            for value in self.inputs.parameters.get_dict().get('qp_prepend'):
+                handle.write(f"{code_command} {config_command} {value} {ezfio}\n")
 
-        handle.write(f"qp run {run_type} {append}\n")
+        handle.write(run_command + "\n")
+
+        if tbf:
+            handle.write(f'sed -i "1s|^|$(pwd)/|" aiida.ezfio/trexio/trexio_file\n')
+
+        handle.write(f'echo "#*#* ERROR CODE: $? #*#*"\n')
         handle.write(f"tar czf {self.metadata.options.output_wf_basename}.tar.gz *.ezfio\n")
 #EOF
