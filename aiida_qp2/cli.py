@@ -349,7 +349,8 @@ def set_default_code(code):
 @cli.command("dump")
 @wf_option
 @decorators.with_dbenv()
-def dump(wavefunction):
+@click.option("--extract", "-e", is_flag=True, help="Extract the wavefunction")
+def dump(wavefunction, extract):
     """Dump wavefunction to the file system (in the current directory)"""
 
     from aiida.orm import SinglefileData as Wavefunction
@@ -363,7 +364,13 @@ def dump(wavefunction):
         return
 
     import os
-    with open(f"{os.getcwd()}/{wavefunction.pk}_wf.tar.gz", "wb") as handle_output, \
-         wavefunction.open(mode="rb") as handle_input:
-        handle_output.write(handle_input.read())
+    if extract:
+        import tarfile
+        with wavefunction.open(mode="rb") as handle_wf:
+            with tarfile.open(fileobj=handle_wf, mode="r:gz") as handle_tar:
+                handle_tar.extractall(path=os.getcwd())
+    else:
+        with open(f"{os.getcwd()}/{wavefunction.pk}_wf.tar.gz", "wb") as handle_output, \
+             wavefunction.open(mode="rb") as handle_input:
+            handle_output.write(handle_input.read())
 
