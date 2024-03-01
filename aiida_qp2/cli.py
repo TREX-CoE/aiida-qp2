@@ -346,3 +346,24 @@ def set_default_code(code):
     else:
         echo.echo_error(f"No active project")
 
+@smart.command("dump")
+@wf_option
+@decorators.with_dbenv()
+def dump(wavefunction):
+    """Dump wavefunction to the file system (in the current directory)"""
+
+    from aiida.orm import SinglefileData as Wavefunction
+
+    if wavefunction is None:
+        echo.echo_critical("Please specify a wavefunction")
+        return
+
+    if not isinstance(wavefunction, Wavefunction):
+        echo.echo_critical("Invalid wavefunction")
+        return
+
+    import os
+    with open(f"{os.getcwd()}/{wavefunction.pk}_wf.tar.gz", "wb") as handle_output, \
+         wavefunction.open(mode="rb") as handle_input:
+        handle_output.write(handle_input.read())
+
