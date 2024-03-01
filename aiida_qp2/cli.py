@@ -374,3 +374,33 @@ def dump(wavefunction, extract):
              wavefunction.open(mode="rb") as handle_input:
             handle_output.write(handle_input.read())
 
+@cli.command("output")
+@wf_option
+@decorators.with_dbenv()
+def output(wavefunction):
+    """Show wavefunction output"""
+
+    from aiida.orm import QueryBuilder, CalcJobNode, FolderData, SinglefileData as Wavefunction
+    from aiida.plugins import CalculationFactory
+
+    if wavefunction is None:
+        echo.echo_critical("Please specify a wavefunction")
+        return
+
+    if not isinstance(wavefunction, Wavefunction):
+        echo.echo_critical("Invalid wavefunction")
+        return
+
+    qb = QueryBuilder()
+    qb.append(Wavefunction, filters={ 'id': wavefunction.pk}, tag="wf")
+    qb.append(CalcJobNode, with_outgoing="wf", tag="calc", project=["attributes.output_filename"])
+    qb.append(FolderData, with_incoming="calc", edge_filters={"label": "retrieved"}, tag="output", project=["*"])
+
+    if qb.count() < 1:
+        echo.echo_error("No output found")
+        return
+
+    filename, rf = qb.first()
+
+    with rf.open(filename, mode="r") as handle:
+        echo.echo(handle.read())
