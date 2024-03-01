@@ -11,11 +11,11 @@ from aiida_qp2.cli_helpers import wf_option, code_option
 _QP_GROUP = "qp2_project_group"
 
 @verdi_data.group("qp2")
-def smart():
+def cli():
     """Manage qp2"""
 
 
-@smart.command("create")
+@cli.command("create")
 @click.argument("name", type=click.STRING)
 @click.option("--structure", "-s", type=click.STRING, required=True, help="Structure to use")
 @click.option("--basis_set", "-b", type=click.STRING, required=False, help="Basis set to use")
@@ -87,7 +87,7 @@ def create(name, structure, basis_set, code):
 
     group.add_nodes(ret["wavefunction"])
 
-@smart.command("list")
+@cli.command("list")
 @decorators.with_dbenv()
 def list():
     """List qp2 projects"""
@@ -149,7 +149,7 @@ def list():
 
     echo.echo(tabulate.tabulate(data, headers=[" ", "Name", "ID", "Time", "User", "Formula", "Def. code"]))
 
-@smart.command("activate")
+@cli.command("activate")
 @click.argument("pk", type=click.INT)
 @decorators.with_dbenv()
 def activate(pk):
@@ -175,7 +175,7 @@ def activate(pk):
     else:
         echo.echo_error(f"Project with pk={pk} not found")
 
-@smart.command("deactivate")
+@cli.command("deactivate")
 @decorators.with_dbenv()
 def deactivate():
     """Deactivate a pq2 project"""
@@ -191,7 +191,7 @@ def deactivate():
     group.base.extras.set("active_project", None)
     echo.echo_success("Deactivated project")
 
-@smart.command("run")
+@cli.command("run")
 @click.argument("operation", type=click.STRING)
 @code_option
 @wf_option
@@ -250,7 +250,7 @@ def run(operation, code, wavefunction, dry_run, prepend, do_not_store_wf, trexio
         echo.echo("")
         echo.echo_success(f"Operation {operation} completed")
 
-@smart.command("show")
+@cli.command("show")
 @decorators.with_dbenv()
 def show():
     """Show active qp2 project"""
@@ -312,7 +312,7 @@ def show():
 
         echo.echo(tree.show(stdout=False))
 
-@smart.command("set_default_code")
+@cli.command("set_default_code")
 #@click.argument("code", type=click.STRING, help="Code to set as default, provide pk, uuid or label")
 @click.argument("code", type=click.STRING)
 @decorators.with_dbenv()
@@ -346,7 +346,7 @@ def set_default_code(code):
     else:
         echo.echo_error(f"No active project")
 
-@smart.command("dump")
+@cli.command("dump")
 @wf_option
 @decorators.with_dbenv()
 def dump(wavefunction):
