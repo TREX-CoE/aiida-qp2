@@ -72,6 +72,7 @@ def create(name, structure, basis_set, code):
               "parameters": Dict(dict={}) }
 
     if basis_set:
+        from aiida.orm import Str
         inputs["basis_set"] = Str(basis_set)
 
     from aiida.plugins import CalculationFactory
@@ -304,7 +305,10 @@ def show():
         tree.create_node(wavefunction.pk, wavefunction.pk)
 
         for child, job, a, par in sorted(qb.iterall(), key=lambda x: x[1].ctime):
-            tree.create_node(f"{a}: {child}", child, parent=par)
+            try:
+                tree.create_node(f"{a}: {child}", child, parent=par)
+            except:
+                pass
 
         echo.echo(tree.show(stdout=False))
 
