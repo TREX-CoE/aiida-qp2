@@ -148,7 +148,7 @@ class QP2RunCalculation(CalcJob):
             raise ValueError("run_type not specified in parameters")
 
         code_command = "qp"
-        config_commad = "set"
+        config_command = "set"
         run_command = f"qp run {run_type} {append}"
         ezfio = ""
 
