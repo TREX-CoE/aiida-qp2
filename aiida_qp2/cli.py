@@ -137,17 +137,27 @@ def list():
     def get_code(n, w):
         return load_node(w.base.extras.all['default_code']).full_label
 
+    def get_num_wf(n, w):
+        qb = QueryBuilder()
+        qb.append(Wavefunction, filters={ 'id': w.pk}, tag="mother")
+        qb.append(Wavefunction, with_ancestors="mother",
+                                tag="child",
+                                filters={'attributes.wavefunction': True},
+                                project=["id"])
+        return qb.count()
+
     data = [ (get_active(n, w),
               get_name(n, w),
               w.pk,
               w.ctime.strftime('%Y-%m-%d %H:%M:%S'),
               w.user,
               get_formula(n, w),
-              get_code(n,w)) for n, (w,) in enumerate(qb.iterall())]
+              get_code(n,w),
+              get_num_wf(n,w)) for n, (w,) in enumerate(qb.iterall())]
 
     import tabulate
 
-    echo.echo(tabulate.tabulate(data, headers=[" ", "Name", "ID", "Time", "User", "Formula", "Def. code"]))
+    echo.echo(tabulate.tabulate(data, headers=[" ", "Name", "ID", "Time", "User", "Formula", "Def. code", "# wfs"]))
 
 @cli.command("activate")
 @click.argument("pk", type=click.INT)
