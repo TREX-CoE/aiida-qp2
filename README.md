@@ -82,6 +82,8 @@ Now run `verdi status` and you should not see any error messages:
 
 ## Running AiiDA qp2
 
+N.B.: One can execute console script either through `verdi data qp2.cli` command or with a shortcut `aqp`
+
 ```
 echo "2
 
@@ -89,6 +91,8 @@ H 0.0 0.0 0.0
 H 0.7 0.0 0.0" > H2.xyz
 
 verdi data qp2.cli create --code qp2-docker@localhost --structure H2.xyz
+# Or equivalent with:
+# aqp create --code qp2-docker@localhost --structure H2.xyz
 
 verdi data qp2.cli list # Find pk of your project
 
@@ -115,7 +119,7 @@ You can install this code in the same way how the qp code was installed. In fact
 Recomended workflow follows:
 
 ```
-verdi data qp2.cli run save_for_qmcchem --trexio-bug-fix
+aqp run save_for_qmcchem --trexio-bug-fix
 ```
 
 The option `--trexio-bug-fix` is there because there is a bug where one has to manually put absolute path to the trexio file. This flag will fix it.
@@ -123,5 +127,5 @@ The option `--trexio-bug-fix` is there because there is a bug where one has to m
 Now run `QMC=Chem`:
 
 ```
-verdi data qp2.cli run qmcchem -p "-t 1800" -p "-l 20"
+aqp run qmcchem -p "-t 1800" -p "-l 20"
 ```

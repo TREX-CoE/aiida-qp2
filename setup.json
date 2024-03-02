@@ -14,6 +14,9 @@
     ],
     "version": "0.3.0",
     "entry_points": {
+	"console_scripts": [
+	    "aqp = aiida_qp2.cli:cli"
+	],
 	"aiida.cmdline.data": [
 	    "qp2.cli = aiida_qp2.cli:cli"
         ],
