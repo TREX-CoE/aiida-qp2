@@ -356,11 +356,18 @@ def set_default_code(code):
     else:
         echo.echo_error(f"No active project")
 
-@cli.command("dump")
+@verdi_data.group("dump")
+def dump():
+    """
+    Dump the data to the file system
+    """
+    pass
+
+@dump.command("wavefunction")
 @wf_option
-@decorators.with_dbenv()
 @click.option("--extract", "-e", is_flag=True, help="Extract the wavefunction")
-def dump(wavefunction, extract):
+@decorators.with_dbenv()
+def dump_wavefunction(wavefunction, extract):
     """Dump wavefunction to the file system (in the current directory)"""
 
     from aiida.orm import SinglefileData as Wavefunction
@@ -379,16 +386,18 @@ def dump(wavefunction, extract):
         with wavefunction.open(mode="rb") as handle_wf:
             with tarfile.open(fileobj=handle_wf, mode="r:gz") as handle_tar:
                 handle_tar.extractall(path=os.getcwd())
+        echo.echo_success(f"Extracted wavefunction to {os.getcwd()}")
     else:
         with open(f"{os.getcwd()}/{wavefunction.pk}_wf.tar.gz", "wb") as handle_output, \
              wavefunction.open(mode="rb") as handle_input:
             handle_output.write(handle_input.read())
+        echo.echo_success(f"Dumped wavefunction to {os.getcwd()}/{wavefunction.pk}_wf.tar.gz")
 
-@cli.command("output")
+@dump.command("output")
 @wf_option
 @decorators.with_dbenv()
-def output(wavefunction):
-    """Show wavefunction output"""
+def dump_output(wavefunction):
+    """Show calculation output"""
 
     from aiida.orm import QueryBuilder, CalcJobNode, FolderData, SinglefileData as Wavefunction
     from aiida.plugins import CalculationFactory
@@ -414,3 +423,41 @@ def output(wavefunction):
 
     with rf.open(filename, mode="r") as handle:
         echo.echo(handle.read())
+
+@dump.command("input")
+@wf_option
+@decorators.with_dbenv()
+def dump_input(wavefunction):
+    """Show calculation input"""
+
+    from aiida.orm import QueryBuilder, CalcJobNode, Dict, SinglefileData as Wavefunction
+    from aiida.plugins import CalculationFactory
+
+    if wavefunction is None:
+        echo.echo_critical("Please specify a wavefunction")
+        return
+
+    if not isinstance(wavefunction, Wavefunction):
+        echo.echo_critical("Invalid wavefunction")
+        return
+
+    qb = QueryBuilder()
+    qb.append(Wavefunction, filters={ 'id': wavefunction.pk}, tag="wf")
+    qb.append(CalcJobNode, with_outgoing="wf", tag="calc")
+    qb.append(Dict, with_outgoing="calc", edge_filters={"label": "parameters"}, tag="input", project=["*"])
+
+    if qb.count() < 1:
+        echo.echo_error("No input found")
+        return
+
+    params, = qb.first()
+
+    import yaml
+    from io import StringIO
+    buffer = StringIO()
+    yaml.dump(params.get_dict(), buffer)
+    buffer.seek(0)
+    echo.echo(buffer.read())
+
+cli.add_command(dump)
+
