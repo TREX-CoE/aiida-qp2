@@ -3,14 +3,18 @@
 
 import click
 
-from aiida.cmdline.commands.cmd_data import verdi_data
 from aiida import cmdline
+from aiida.cmdline.commands.cmd_data import verdi_data
+from aiida.cmdline.groups import VerdiCommandGroup
+from aiida.cmdline.params import options, types
 from aiida.cmdline.utils import decorators, echo
+
 from aiida_qp2.cli_helpers import wf_option, code_option
 
 _QP_GROUP = "qp2_project_group"
 
-@verdi_data.group("qp2")
+@click.group('aiida-qp2', cls=VerdiCommandGroup, context_settings={'help_option_names': ['-h', '--help']})
+@options.PROFILE(type=types.ProfileParamType(load_profile=True), expose_value=False)
 def cli():
     """Manage qp2"""
 
@@ -356,7 +360,7 @@ def set_default_code(code):
     else:
         echo.echo_error(f"No active project")
 
-@verdi_data.group("dump")
+@cli.group("dump")
 def dump():
     """
     Dump the data to the file system
