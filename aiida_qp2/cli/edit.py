@@ -118,4 +118,52 @@ def edit_interactive(wavefunction):
 
 
 
+@edit.command("from_file")
+@wf_option
+@click.argument("file", type=click.Path(exists=True))
+@decorators.with_dbenv()
+def edit_from_file(wavefunction, file):
+    """
+    Edit the wavefunction from a file
+    """
+
+    if not wavefunction:
+        echo.echo_critical("No wavefunction specified")
+        return
+
+    from aiida.orm import SinglefileData
+    import re
+
+    operations = []
+    with open(file, 'r') as handle:
+        getter = re.compile(r"get\s+(\w+)")
+        setter = re.compile(r'set\s+(\w+)\s+"([^"]*)"')
+        for line in handle:
+            match = getter.match(line)
+            if match:
+                key = match.group(1)
+                operations.append(("get", key, None))
+                continue
+            match = setter.match(line)
+            if match:
+                key = match.group(1)
+                value = match.group(2)
+                operations.append(("set", key, value))
+                continue
+
+    from aiida_qp2.utils.wavefunction_handler import wavefunction_handler
+    from aiida.orm import List
+
+    ret  = wavefunction_handler(wavefunction, List(operations))
+
+    if "data" in ret:
+        data = ret["data"].get_list()
+        for line in data:
+            echo.echo_dictionary(line)
+
+    if "wavefunction" in ret:
+        echo.echo_success(f"Wavefunction edited and stored (pk={wavefunction.pk})")
+    else:
+        echo.echo("Wavefunction unmofified")
+
 
