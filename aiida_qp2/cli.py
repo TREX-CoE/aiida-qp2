@@ -148,7 +148,8 @@ def list():
                                 tag="child",
                                 filters={'attributes.wavefunction': True},
                                 project=["id"])
-        return qb.count()
+        # +1 for the mother
+        return qb.count() + 1
 
     data = [ (get_active(n, w),
               get_name(n, w),
