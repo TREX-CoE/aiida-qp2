@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import click
 
 from aiida import cmdline
@@ -9,17 +8,17 @@ from aiida.cmdline.groups import VerdiCommandGroup
 from aiida.cmdline.params import options, types
 from aiida.cmdline.utils import decorators, echo
 
-from aiida_qp2.cli_helpers import wf_option, code_option
+from .cli_helpers import wf_option, code_option
 
 _QP_GROUP = "qp2_project_group"
 
 @click.group('aiida-qp2', cls=VerdiCommandGroup, context_settings={'help_option_names': ['-h', '--help']})
 @options.PROFILE(type=types.ProfileParamType(load_profile=True), expose_value=False)
-def cli():
+def cli_root():
     """Manage qp2"""
 
 
-@cli.command("create")
+@cli_root.command("create")
 @click.argument("name", type=click.STRING)
 @click.option("--structure", "-s", type=click.STRING, required=True, help="Structure to use")
 @click.option("--basis_set", "-b", type=click.STRING, required=False, help="Basis set to use")
@@ -91,7 +90,7 @@ def create(name, structure, basis_set, code):
 
     group.add_nodes(ret["wavefunction"])
 
-@cli.command("list")
+@cli_root.command("list")
 @decorators.with_dbenv()
 def list():
     """List qp2 projects"""
@@ -164,7 +163,7 @@ def list():
 
     echo.echo(tabulate.tabulate(data, headers=[" ", "Name", "ID", "Time", "User", "Formula", "Def. code", "# wfs"]))
 
-@cli.command("activate")
+@cli_root.command("activate")
 @click.argument("pk", type=click.INT)
 @decorators.with_dbenv()
 def activate(pk):
@@ -190,7 +189,7 @@ def activate(pk):
     else:
         echo.echo_error(f"Project with pk={pk} not found")
 
-@cli.command("deactivate")
+@cli_root.command("deactivate")
 @decorators.with_dbenv()
 def deactivate():
     """Deactivate a qp2 project"""
@@ -206,7 +205,7 @@ def deactivate():
     group.base.extras.set("active_project", None)
     echo.echo_success("Deactivated project")
 
-@cli.command("run")
+@cli_root.command("run")
 @click.argument("operation", type=click.STRING)
 @code_option
 @wf_option
@@ -267,7 +266,7 @@ def run(operation, code, wavefunction, dry_run, prepend, do_not_store_wf, trexio
         echo.echo("")
         echo.echo_success(f"Operation {operation} completed")
 
-@cli.command("show")
+@cli_root.command("show")
 @decorators.with_dbenv()
 def show():
     """Show active qp2 project"""
@@ -329,8 +328,7 @@ def show():
 
         echo.echo(tree.show(stdout=False))
 
-@cli.command("set_default_code")
-#@click.argument("code", type=click.STRING, help="Code to set as default, provide pk, uuid or label")
+@cli_root.command("set_default_code")
 @click.argument("code", type=click.STRING)
 @decorators.with_dbenv()
 def set_default_code(code):
@@ -363,108 +361,5 @@ def set_default_code(code):
     else:
         echo.echo_error(f"No active project")
 
-@cli.group("dump")
-def dump():
-    """
-    Dump the data to the file system
-    """
-    pass
-
-@dump.command("wavefunction")
-@wf_option
-@click.option("--extract", "-e", is_flag=True, help="Extract the wavefunction")
-@decorators.with_dbenv()
-def dump_wavefunction(wavefunction, extract):
-    """Dump wavefunction to the file system (in the current directory)"""
-
-    from aiida.orm import SinglefileData as Wavefunction
-
-    if wavefunction is None:
-        echo.echo_critical("Please specify a wavefunction")
-        return
-
-    if not isinstance(wavefunction, Wavefunction):
-        echo.echo_critical("Invalid wavefunction")
-        return
-
-    import os
-    if extract:
-        import tarfile
-        with wavefunction.open(mode="rb") as handle_wf:
-            with tarfile.open(fileobj=handle_wf, mode="r:gz") as handle_tar:
-                handle_tar.extractall(path=os.getcwd())
-        echo.echo_success(f"Extracted wavefunction to {os.getcwd()}")
-    else:
-        with open(f"{os.getcwd()}/{wavefunction.pk}_wf.tar.gz", "wb") as handle_output, \
-             wavefunction.open(mode="rb") as handle_input:
-            handle_output.write(handle_input.read())
-        echo.echo_success(f"Dumped wavefunction to {os.getcwd()}/{wavefunction.pk}_wf.tar.gz")
-
-@dump.command("output")
-@wf_option
-@decorators.with_dbenv()
-def dump_output(wavefunction):
-    """Show calculation output"""
-
-    from aiida.orm import QueryBuilder, CalcJobNode, FolderData, SinglefileData as Wavefunction
-    from aiida.plugins import CalculationFactory
-
-    if wavefunction is None:
-        echo.echo_critical("Please specify a wavefunction")
-        return
-
-    if not isinstance(wavefunction, Wavefunction):
-        echo.echo_critical("Invalid wavefunction")
-        return
-
-    qb = QueryBuilder()
-    qb.append(Wavefunction, filters={ 'id': wavefunction.pk}, tag="wf")
-    qb.append(CalcJobNode, with_outgoing="wf", tag="calc", project=["attributes.output_filename"])
-    qb.append(FolderData, with_incoming="calc", edge_filters={"label": "retrieved"}, tag="output", project=["*"])
-
-    if qb.count() < 1:
-        echo.echo_error("No output found")
-        return
-
-    filename, rf = qb.first()
-
-    with rf.open(filename, mode="r") as handle:
-        echo.echo(handle.read())
-
-@dump.command("input")
-@wf_option
-@decorators.with_dbenv()
-def dump_input(wavefunction):
-    """Show calculation input"""
-
-    from aiida.orm import QueryBuilder, CalcJobNode, Dict, SinglefileData as Wavefunction
-    from aiida.plugins import CalculationFactory
-
-    if wavefunction is None:
-        echo.echo_critical("Please specify a wavefunction")
-        return
-
-    if not isinstance(wavefunction, Wavefunction):
-        echo.echo_critical("Invalid wavefunction")
-        return
-
-    qb = QueryBuilder()
-    qb.append(Wavefunction, filters={ 'id': wavefunction.pk}, tag="wf")
-    qb.append(CalcJobNode, with_outgoing="wf", tag="calc")
-    qb.append(Dict, with_outgoing="calc", edge_filters={"label": "parameters"}, tag="input", project=["*"])
-
-    if qb.count() < 1:
-        echo.echo_error("No input found")
-        return
-
-    params, = qb.first()
-
-    import yaml
-    from io import StringIO
-    buffer = StringIO()
-    yaml.dump(params.get_dict(), buffer)
-    buffer.seek(0)
-    echo.echo(buffer.read())
-
-cli.add_command(dump)
+from .dump import dump
 
