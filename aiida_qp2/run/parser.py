@@ -11,7 +11,7 @@ from aiida.engine import ExitCode
 from aiida.parsers.parser import Parser
 from aiida.plugins import CalculationFactory
 from aiida.common import exceptions
-from aiida.orm import Float, SinglefileData
+from aiida.orm import Float, Int, SinglefileData
 import json
 
 QP2RunCalculation = CalculationFactory('qp2.run')
@@ -129,11 +129,13 @@ class QP2RunParser(Parser):
         energy_err = None
         energy_qmcvar = None
         energy_qmcvar_err = None
+        number_of_blocks = None
         with out_folder.open(output_filename, 'r') as handle:
             for line in handle:
                 if "          E_loc :" in line:
                     energy = float(line.split()[2])
                     energy_err = float(line.split()[4])
+                    number_of_blocks = int(line.split()[5].replace("(","").replace(")",""))
                 if "   E_loc_qmcvar :" in line:
                     energy_qmcvar = float(line.split()[2])
                     energy_qmcvar_err = float(line.split()[4])
@@ -145,6 +147,8 @@ class QP2RunParser(Parser):
             self.out('output_energy_stddev', Float(energy_qmcvar))
         if energy_qmcvar_err:
             self.out('output_energy_stddev_error', Float(energy_qmcvar_err))
+        if number_of_blocks:
+            self.out('output_number_of_blocks', Int(number_of_blocks))
 
         if store_wavefunction:
             # Store the wavefunction file

@@ -10,7 +10,7 @@ from collections.abc import Sequence
 
 from aiida.common import CalcInfo, CodeInfo
 from aiida.engine import CalcJob
-from aiida.orm import Dict, Float, Code, Str, StructureData, SinglefileData
+from aiida.orm import Dict, Int, Float, Code, Str, StructureData, SinglefileData
 from aiida.plugins import DataFactory
 from pymatgen.core.periodic_table import Element
 
@@ -96,6 +96,12 @@ class QP2RunCalculation(CalcJob):
                     help='The error of the standard deviation calculation')
         spec.output_node = 'output_energy_stddev_error'
 
+        spec.output('output_number_of_blocks',
+                    valid_type=Int,
+                    required=False,
+                    help='The number of blocks in the calculation')
+        spec.output_node = 'output_number_of_blocks'
+
         spec.output('output_wavefunction', valid_type=SinglefileData, required=False,
                     help='The wave function file (EZFIO or TREXIO)')
         spec.output_node = 'output_wavefunction'
@@ -160,6 +166,7 @@ class QP2RunCalculation(CalcJob):
 
         handle.write("#!/bin/bash\n")
         handle.write("set -e\n")
+        handle.write("set -x\n")
         handle.write("tar xzf aiida.wf.tar.gz\n")
         handle.write(f"qp set_file aiida.ezfio\n")
 

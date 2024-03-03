@@ -168,7 +168,7 @@ def list():
 @click.argument("pk", type=click.INT)
 @decorators.with_dbenv()
 def activate(pk):
-    """Activate a pq2 project"""
+    """Activate a qp2 project"""
 
     from aiida.orm import QueryBuilder, Group, SinglefileData as Wavefunction, load_group
 
@@ -193,7 +193,7 @@ def activate(pk):
 @cli.command("deactivate")
 @decorators.with_dbenv()
 def deactivate():
-    """Deactivate a pq2 project"""
+    """Deactivate a qp2 project"""
 
     from aiida.orm import QueryBuilder, Group, SinglefileData as Wavefunction, load_group
 
@@ -217,7 +217,7 @@ def deactivate():
 @click.argument("args", nargs=-1, type=click.UNPROCESSED)
 @decorators.with_dbenv()
 def run(operation, code, wavefunction, dry_run, prepend, do_not_store_wf, trexio_bug_fix, args):
-    """Run a pq2 operation"""
+    """Run a qp2 operation"""
 
     echo.echo(f"Running operation {operation} ...")
     echo.echo("")
@@ -261,6 +261,8 @@ def run(operation, code, wavefunction, dry_run, prepend, do_not_store_wf, trexio
         energy_msg = f"Energy: {ret['output_energy'].value}"
         if "output_energy_error" in ret:
             energy_msg += f" +/- {ret['output_energy_error'].value}"
+        if "output_number_of_blocks" in ret:
+            energy_msg += f" (blocks: {ret['output_number_of_blocks'].value})"
         echo.echo(f"{energy_msg}")
         echo.echo("")
         echo.echo_success(f"Operation {operation} completed")
