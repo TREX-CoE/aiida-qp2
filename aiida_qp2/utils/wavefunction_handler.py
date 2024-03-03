@@ -53,5 +53,6 @@ def wavefunction_handler(wavefunction, operations):
 
     if changed:
         ret["wavefunction"] = wavefunction
+        wavefunction.base.attributes.all["wavefunction"] = True
 
     return ret
