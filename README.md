@@ -57,7 +57,8 @@ Lastly we need to setup the code. Again to do the most simple setup one can pull
 ```
 $ docker push addman151/qp2-aiida:tagname
 
-# It is best to use tagname=latest
+# you can use    tagname:latest - for serial qmcchem
+# or you can use tagname:intel  - for parallel
 ```
 
 Unfortunatelly, the image is litle bit large, something what has to be fix in the future. When the image is downloaded we can continue by creating new code node inside AiiDA. Again we will use an yaml file.
