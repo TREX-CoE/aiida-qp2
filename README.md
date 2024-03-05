@@ -32,7 +32,7 @@ You will be promted some questions but answering them is very easy. Setting up P
 Now you need to specify computer where you want to run your calculations. Here is the setup for your local computer. First setup a `yaml` file with setting called `localhost.yaml` and then setup the code.
 
 ```
-$ cat localhost.yaml
+$ cat > localhost.yaml
 ---
 label: "localhost"
 hostname: "localhost"
@@ -43,9 +43,9 @@ use_double_quotes: true
 mpirun_command: "mpirun -np {tot_num_mpiprocs}"
 mpiprocs_per_machine: "8"
 prepend_text: " "
-appent_test: " "
+append_text: " "
 
-$ verdi copmuter setup --config localhost.yaml
+$ verdi computer setup --config localhost.yaml
 ```
 
 One can test the computer via `verdi computer test <label>`.
@@ -55,7 +55,7 @@ One can test the computer via `verdi computer test <label>`.
 Lastly we need to setup the code. Again to do the most simple setup one can pull docker image from docker hub.
 
 ```
-$ docker push addman151/qp2-aiida:tagname
+$ docker pull docker://addman151/qp2-aiida:tagname
 
 # you can use    tagname:latest - for serial qmcchem
 # or you can use tagname:intel  - for parallel
@@ -64,7 +64,7 @@ $ docker push addman151/qp2-aiida:tagname
 Unfortunatelly, the image is litle bit large, something what has to be fix in the future. When the image is downloaded we can continue by creating new code node inside AiiDA. Again we will use an yaml file.
 
 ```
-$ cat qp.yaml
+$ cat > qp.yaml
 engine_command: "docker run -v $(pwd):/data {image_name}"
 wrap_cmdline_params: false
 use_double_quotes: false
@@ -101,7 +101,7 @@ echo "2
 H 0.0 0.0 0.0
 H 0.7 0.0 0.0" > H2.xyz
 
-verdi data qp2.cli create --code qp2-docker@localhost --structure H2.xyz
+verdi data qp2.cli create Hydrogen2 --code qp2-docker@localhost --structure H2.xyz
 # Or equivalent with:
 # aqp create --code qp2-docker@localhost --structure H2.xyz
 
@@ -117,12 +117,12 @@ verdi data qp2.cli show # Look at the results
 
 I wrote these command from head hopefully there are no mistakes.
 
-## Runnin QMC=Chem
+## Running QMC=Chem
 
 Pull `QMC=Chem` docker image
 
 ```
-docker pull addman151/qmcchem-aiida
+docker pull docker://addman151/qmcchem-aiida
 ```
 
 You can install this code in the same way how the qp code was installed. In fact this image contain also `qp` so you can you this image also for previous calculations.
