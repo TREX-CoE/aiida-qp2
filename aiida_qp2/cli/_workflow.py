@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import click
-
-from . import cli_root
+from aiida.cmdline.utils import decorators, echo
 
 from .cli_helpers import wf_option, code_option
+
+from . import cli_root
 
 @cli_root.group("workflow")
 def workflow():
@@ -14,7 +15,7 @@ def workflow():
 @workflow.command("jastopt")
 @wf_option
 @code_option
-@click.option("--optimize", -1, nargs="+", type=string, help="Jastrow parameters to optimize")
+@click.option("--optimize", "-1", nargs="+", type=click.STRING, help="Jastrow parameters to optimize")
 @decorators.with_dbenv()
 def jastopt_operation(wf, code, optimize):
     """Jastopt operation"""

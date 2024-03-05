@@ -491,4 +491,5 @@ def set_default_code(code):
 
 from ._dump import dump
 from ._edit import edit
+from ._workflow import workflow
 
