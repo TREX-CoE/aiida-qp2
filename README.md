@@ -11,6 +11,12 @@ This is a brief installation guide fo aiida-qp2. First one needs to setup proper
 $ pip install aiida-qp2
 ```
 
+Command line code completion with `TAB` is very usefull, dont hesitate to activate it and use it:
+
+```
+eval "$(_VERDI_COMPLETE=bash_source verdi)"
+```
+
 ### AiiDA profile
 
 First we need to setup profile. One can use `postgreSQL` as a db backend but for simplicity we will show you SQLite setup:
