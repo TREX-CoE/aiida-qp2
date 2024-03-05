@@ -2,6 +2,7 @@
 
 import click
 
+import sys
 from aiida import cmdline
 from aiida.cmdline.commands.cmd_data import verdi_data
 from aiida.cmdline.groups import VerdiCommandGroup
@@ -272,7 +273,7 @@ def show():
     """Show active qp2 project"""
 
     from aiida.orm import QueryBuilder, Group, SinglefileData as Wavefunction
-    from aiida.orm import CalcJobNode, Dict, load_group
+    from aiida.orm import CalcJobNode, Dict, load_group, CalcFunctionNode
 
     try:
         group = load_group(_QP_GROUP)
@@ -302,8 +303,38 @@ def show():
     qb.append(CalcJobNode, with_outgoing="child", tag="calc", project=["*"])
     qb.append(Dict, with_outgoing="calc", tag="dict", project=["attributes.run_type"])
     qb.append(Wavefunction, with_outgoing="calc", tag="par", project=["id"])
-    echo.echo(f"Number of wavefunctions: {qb.count()}")
+
+    # Special case for calcfunctions
+    qbf = QueryBuilder()
+    qbf.append(Wavefunction, filters={ 'id': group.base.extras.all['active_project']}, tag="mother")
+    qbf.append(Wavefunction, with_ancestors="mother", tag="child", project=["id"])
+    qbf.append(CalcFunctionNode, with_outgoing="child", tag="calc", project=["*", "label"])
+    qbf.append(Wavefunction, with_outgoing="calc", tag="par", project=["id"])
+
+    echo.echo(f"Number of wavefunctions: {qb.count() + qbf.count()}")
     echo.echo("")
+
+    def _get_energy_from_job(j):
+        try:
+            return f"{j.outputs.output_energy.value:.6f}"
+        except:
+            return ""
+
+    def _get_name(n):
+        if "wavefunction_handler" == n:
+            return "edit"
+        return n
+
+    class calcholder:
+        def __init__(self, j):
+            self.j = j
+
+        @property
+        def energy(self):
+            try:
+                return self.j.outputs.output_energy.value
+            except:
+                return None
 
     try:
         from treelib import Tree
@@ -312,21 +343,95 @@ def show():
         echo.echo("")
         Tree = None
 
+    # get data
+    nodes = []
+    for child, job, a, par in qb.iterall():
+        nodes.append((child, job, a, par))
+    for child, job, a, par in qbf.iterall():
+        nodes.append((child, job, a, par))
+
     if Tree is None:
         echo.echo(f"Parent: {wavefunction.pk}")
-        for child, job, a, par in sorted(qb.iterall(), key=lambda x: x[1].ctime):
-            echo.echo(f"{a}: {child}")
+        for child, job, a, par in sorted(nodes, key=lambda x: x[1].ctime):
+            echo.echo(f"{a}: {child} | {_get_energy_from_job(job)}")
     else:
         tree = Tree()
-        tree.create_node(wavefunction.pk, wavefunction.pk)
+        tree.create_node(wavefunction.pk, wavefunction.pk, data=calcholder(None))
 
-        for child, job, a, par in sorted(qb.iterall(), key=lambda x: x[1].ctime):
+        for child, job, a, par in sorted(nodes, key=lambda x: x[1].ctime):
             try:
-                tree.create_node(f"{a}: {child}", child, parent=par)
+                tree.create_node(f"{_get_name(a)}: {child} | {_get_energy_from_job(job)}", child, parent=par, data=calcholder(job))
             except:
                 pass
 
-        echo.echo(tree.show(stdout=False))
+        if tree.depth() > 25:
+            echo.echo_warning("Tree is very deep")
+
+        ptree = tree.show(stdout=False)
+
+        # First fill white space in ptree
+        longest_line = max(len(x) for x in ptree.split("\n"))
+
+        # Add white space to the end of each line
+        ptree = "\n".join(x + " " * (longest_line - len(x)) + "|" for x in ptree.split("\n"))
+
+        dtree = tree.show(stdout=False, data_property="energy", line_type="ascii-ex")
+        dtree = dtree.replace("\u2502", "")
+        dtree = dtree.replace("\u251c\u2500\u2500 ", "")
+        dtree = dtree.replace("\u2514\u2500\u2500 ", "")
+
+        dtree = dtree.split("\n")
+        dtree = [x.strip() for x in dtree]
+
+        # This is messy (and should be done in a better way)
+        try:
+            from termgraph.module import Data, BarChart, Args, Colors
+
+            data_without_none = [float(x) for x in dtree if x.strip() not in ("None", "")]
+            if len(data_without_none) == 0:
+                raise NotImplementedError
+            max_data = max(data_without_none)
+            data = [float(x) if x.strip() not in ("None", "")  else max_data for x in dtree]
+            labels = ["GOOD" if x.strip() not in ("None", "")  else "BAAD" for x in dtree]
+            ldata = len(data)
+            min_data = min(data)
+            data = [x - min_data + 1.0 for x in data]
+            data = [[x] for x in data]
+            data = Data(data, labels)
+
+            colors = [ Colors.Blue if ii % 2 == 0 else Colors.Red for ii in range(ldata)]
+
+            chart = BarChart(data, Args(colors=colors))
+
+            from io import StringIO
+            capture_output = StringIO()
+            original_stdout = sys.stdout
+            try:
+                sys.stdout = capture_output
+                echo.echo(chart.draw())
+            finally:
+                sys.stdout = original_stdout
+
+            bg = capture_output.getvalue().strip()
+            stree = [" " * (len(ptree.split("\n")[0]) - 1) + f"| Energy offset: {min_data}"]
+
+            bg = bg.split("\n")
+            bg = [ l.replace("GOOD:", "") if "GOOD" in l else "" for l in bg]
+
+            for line, dline in zip(ptree.split("\n"), bg):
+                stree.append(line + " " + dline)
+
+            ptree = "\n".join(stree)
+
+        except ImportError:
+            echo.echo("Please install termgraph to show the plots")
+            echo.echo("")
+
+        except NotImplementedError:
+            pass
+
+
+        echo.echo(ptree)
 
 @cli_root.command("set_default_code")
 @click.argument("code", type=click.STRING)
