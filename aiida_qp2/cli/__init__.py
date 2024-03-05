@@ -361,6 +361,6 @@ def set_default_code(code):
     else:
         echo.echo_error(f"No active project")
 
-from .dump import dump
-from .edit import edit
+from ._dump import dump
+from ._edit import edit
 
