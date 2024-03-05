@@ -314,27 +314,34 @@ def show():
     echo.echo(f"Number of wavefunctions: {qb.count() + qbf.count()}")
     echo.echo("")
 
-    def _get_energy_from_job(j):
-        try:
-            return f"{j.outputs.output_energy.value:.6f}"
-        except:
-            return ""
+    class CalcHolder():
 
-    def _get_name(n):
-        if "wavefunction_handler" == n:
-            return "edit"
-        return n
-
-    class calcholder:
-        def __init__(self, j):
-            self.j = j
+        def __init__(self, child, job, name, par):
+            self.child = child
+            self.job = job
+            self.name = name
+            self.par = par
+            self.active = False
 
         @property
         def energy(self):
             try:
-                return self.j.outputs.output_energy.value
+                return self.job.outputs["output_energy"].value
             except:
                 return None
+
+        @property
+        def label(self):
+            wf_pk = self.child
+            name = self.name
+            if name == "wavefunction_handler":
+                name = "edit"
+            msg = f"{name}: {wf_pk}"
+            if self.energy is not None:
+                msg += f" | {self.energy:.6f}"
+            if self.active:
+                msg = "\033[1m" + msg + "\033[0m"
+            return msg
 
     try:
         from treelib import Tree
@@ -346,34 +353,43 @@ def show():
     # get data
     nodes = []
     for child, job, a, par in qb.iterall():
-        nodes.append((child, job, a, par))
+        nodes.append(CalcHolder(child, job, a, par))
     for child, job, a, par in qbf.iterall():
-        nodes.append((child, job, a, par))
+        nodes.append(CalcHolder(child, job, a, par))
+
+    newest = sorted(nodes, key=lambda x: x.job.ctime)[-1]
+    newest.active = True
 
     if Tree is None:
         echo.echo(f"Parent: {wavefunction.pk}")
-        for child, job, a, par in sorted(nodes, key=lambda x: x[1].ctime):
-            echo.echo(f"{a}: {child} | {_get_energy_from_job(job)}")
+        for ch in sorted(nodes, key=lambda x: x.job.ctime):
+            echo.echo(ch.label)
     else:
         tree = Tree()
-        tree.create_node(wavefunction.pk, wavefunction.pk, data=calcholder(None))
+        tree.create_node(wavefunction.pk, wavefunction.pk, data=CalcHolder(None, None, "root", None))
 
-        for child, job, a, par in sorted(nodes, key=lambda x: x[1].ctime):
+        for ch in sorted(nodes, key=lambda x: x.job.ctime):
             try:
-                tree.create_node(f"{_get_name(a)}: {child} | {_get_energy_from_job(job)}", child, parent=par, data=calcholder(job))
+                tree.create_node(ch.label, ch.child, parent=ch.par, data=ch)
             except:
                 pass
 
-        if tree.depth() > 25:
+        if tree.depth() > 20:
             echo.echo_warning("Tree is very deep")
 
-        ptree = tree.show(stdout=False)
+
+        ptree = tree.show(stdout=False, data_property="label")
 
         # First fill white space in ptree
-        longest_line = max(len(x) for x in ptree.split("\n"))
+        def _length(s):
+            s = s.replace("\033[1m", "")
+            s = s.replace("\033[0m", "")
+            return len(s)
+
+        longest_line = max(_length(x) for x in ptree.split("\n"))
 
         # Add white space to the end of each line
-        ptree = "\n".join(x + " " * (longest_line - len(x)) + "|" for x in ptree.split("\n"))
+        ptree = "\n".join(x + " " * (longest_line - _length(x)) + "|" for x in ptree.split("\n"))
 
         dtree = tree.show(stdout=False, data_property="energy", line_type="ascii-ex")
         dtree = dtree.replace("\u2502", "")
@@ -429,7 +445,6 @@ def show():
 
         except NotImplementedError:
             pass
-
 
         echo.echo(ptree)
 
