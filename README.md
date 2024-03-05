@@ -3,10 +3,10 @@
 
 ## Installation
 
-This is a brief installation guide fo aiida-qp2. First one needs to setup properly `aiida` it should be installed whten package is installed. Also RabbitMQ is importat to run `aiida`
+This is a brief installation guide fo aiida-qp2. First one needs to setup properly `aiida` it should be installed when package is installed. Also RabbitMQ is importat to run `aiida`.
 
 ```
-# run it in sim kind of virtual environment
+# It is better to run it in some kind of virtual environment. 
 
 $ pip install aiida-qp2
 ```
@@ -19,7 +19,7 @@ First we need to setup profile. One can use `postgreSQL` as a db backend but for
 $ verdi profile setup core.sqlite_dos
 ```
 
-You will be promted some questions but answering them is easy
+You will be promted some questions but answering them is very easy. Setting up PostgreSQL more challenging, however, it is recomended for larger projects.
 
 ### AiiDA computer
 
@@ -42,12 +42,16 @@ appent_test: " "
 $ verdi copmuter setup --config localhost.yaml
 ```
 
+One can test the computer via `verdi computer test <label>`.
+
 ### AiiDA code
 
 Lastly we need to setup the code. Again to do the most simple setup one can pull docker image from docker hub.
 
 ```
 $ docker push addman151/qp2-aiida:tagname
+
+# It is best to use tagname=latest
 ```
 
 Unfortunatelly, the image is litle bit large, something what has to be fix in the future. When the image is downloaded we can continue by creating new code node inside AiiDA. Again we will use an yaml file.
