@@ -364,8 +364,9 @@ def show():
     for child, job, a, par in qbf.iterall():
         nodes.append(CalcHolder(child, job, a, par))
 
-    newest = sorted(nodes, key=lambda x: x.job.ctime)[-1]
-    newest.active = True
+    if len(nodes) > 0:
+        newest = sorted(nodes, key=lambda x: x.job.ctime)[-1]
+        newest.active = True
 
     if Tree is None:
         echo.echo(f"Parent: {wavefunction.pk}")
@@ -373,7 +374,7 @@ def show():
             echo.echo(ch.label)
     else:
         tree = Tree()
-        tree.create_node(wavefunction.pk, wavefunction.pk, data=CalcHolder(None, None, "root", None))
+        tree.create_node(wavefunction.pk, wavefunction.pk, data=CalcHolder(wavefunction.pk, None, "root", None))
 
         for ch in sorted(nodes, key=lambda x: x.job.ctime):
             try:
@@ -436,7 +437,7 @@ def show():
                 sys.stdout = original_stdout
 
             bg = capture_output.getvalue().strip()
-            stree = [" " * (len(ptree.split("\n")[0]) - 1) + f"| Energy offset: {min_data}"]
+            stree = [" " * (len(ptree.split("\n")[0]) - 1) + f"| Energy offset: {min_data - 1}"]
 
             bg = bg.split("\n")
             bg = [ l.replace("GOOD:", "") if "GOOD" in l else "" for l in bg]
