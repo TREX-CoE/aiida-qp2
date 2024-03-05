@@ -91,6 +91,13 @@ def create(name, structure, basis_set, code):
 
     group.add_nodes(ret["wavefunction"])
 
+    echo.echo_success(f"Project {name} created with pk={ret['wavefunction'].pk}")
+
+    click.confirm("Do you want to activate this project?", abort=True)
+    group.base.extras.set("active_project", ret["wavefunction"].pk)
+
+    echo.echo_success(f"Activated {name}")
+
 @cli_root.command("list")
 @decorators.with_dbenv()
 def list():
