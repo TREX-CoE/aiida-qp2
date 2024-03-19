@@ -16,8 +16,9 @@ import json
 
 QP2RunCalculation = CalculationFactory('qp2.run')
 
-_DICTIONARES = { "scf": "hartree_fock",
+_DICTIONARIES = { "scf": "hartree_fock",
                  "ccsd": "ccsd",
+                 "fci": "fci",
                }
 
 class QP2RunParser(Parser):
@@ -81,7 +82,7 @@ class QP2RunParser(Parser):
             return self.exit_codes.ERROR_MISSING_OUTPUT_FILES
 
         import tarfile
-        method = _DICTIONARES.get(run_type, None)
+        method = _DICTIONARIES.get(run_type, None)
         if method:
             path_energy = f"aiida.ezfio/{method}/energy"
             with out_folder.open(output_wf_filename, 'rb') as wf_out:

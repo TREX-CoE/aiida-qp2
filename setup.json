@@ -38,6 +38,7 @@
     "reentry_register": true,
     "install_requires": [
         "aiida-core>=2.1.0,<3.0.0",
+        "ase",
         "six",
         "psycopg2-binary<2.9",
         "voluptuous",
