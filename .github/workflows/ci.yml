@@ -53,29 +53,29 @@ jobs:
 #
 #     run: py.test --cov qp2 --cov-append .
 
-  docs:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Install python dependencies
-      run: |
-        pip install --upgrade pip
-        pip install --force-reinstall MarkupSafe==2.0.1
-        pip install -e .[docs]
-    - name: Build docs
-      run: cd docs && make
-    - name: Add nojekyll file
-      run: touch docs/build/html/.nojekyll
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/build/html
+  #  docs:
+  #    runs-on: ubuntu-latest
+  #    timeout-minutes: 15
+  #    steps:
+  #    - uses: actions/checkout@v2
+  #    - name: Set up Python 3.8
+  #      uses: actions/setup-python@v2
+  #      with:
+  #        python-version: 3.8
+  #    - name: Install python dependencies
+  #      run: |
+  #        pip install --upgrade pip
+  #        pip install --force-reinstall MarkupSafe==2.0.1
+  #        pip install -e .[docs]
+  #    - name: Build docs
+  #      run: cd docs && make
+  #    - name: Add nojekyll file
+  #      run: touch docs/build/html/.nojekyll
+  #    - name: Deploy
+  #      uses: peaceiris/actions-gh-pages@v3
+  #      with:
+  #        github_token: ${{ secrets.GITHUB_TOKEN }}
+  #        publish_dir: ./docs/build/html
 
   pre-commit:
     runs-on: ubuntu-latest
