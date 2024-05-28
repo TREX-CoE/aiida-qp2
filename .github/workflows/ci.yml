@@ -44,7 +44,6 @@ jobs:
 #     run: |
 #       pip install --upgrade pip
 #       pip install -e .[testing]
-#       reentry scan -r aiida
 #
 #   - name: Run test suite
 #     env:
@@ -68,7 +67,6 @@ jobs:
         pip install --upgrade pip
         pip install --force-reinstall MarkupSafe==2.0.1
         pip install -e .[docs]
-        reentry scan -r aiida
     - name: Build docs
       run: cd docs && make
     - name: Add nojekyll file
@@ -92,7 +90,6 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install -e .[pre-commit,docs,testing]
-        reentry scan -r aiida
     - name: Run pre-commit
       run: |
         pre-commit install
