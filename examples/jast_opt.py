@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 
 from aiida.plugins import DataFactory, CalculationFactory
@@ -15,11 +16,10 @@ Code = DataFactory('core.code')
 
 Calculation = CalculationFactory('qp2.run')
 
-
 load_profile()
 
-class JastOpt():
 
+class JastOpt():
     def __init__(self,
                  wavefunction: SinglefileData,
                  code: Code,
@@ -51,23 +51,24 @@ class JastOpt():
 
     def set_parameters(self, parameters):
         operation = self.parameter_setter(parameters)
-        self.wavefunction = wavefunction_handler(self._wavefunction, operation)["wavefunction"]
+        self.wavefunction = wavefunction_handler(self._wavefunction,
+                                                 operation)['wavefunction']
 
 
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     def p_setter(x):
         x = np.abs(x[0])
-        operation = [ ["set", "jastrow_jast_b_up_up", x ],
-                      ["set", "jastrow_jast_b_up_dn", x ],
-                    ]
+        operation = [
+            ['set', 'jastrow_jast_b_up_up', x],
+            ['set', 'jastrow_jast_b_up_dn', x],
+        ]
         return List(operation)
+
     wf = load_node(779)
 
     code = load_code('qmc-docker-new@bobor2')
-    prepend = ["-t 60", "-l 10"]
+    prepend = ['-t 60', '-l 10']
     jast = JastOpt(wavefunction=wf,
                    code=code,
                    parameter_setter=p_setter,
@@ -76,11 +77,9 @@ if __name__ == "__main__":
     data = []
     for x in np.linspace(0.001, 0.012, 5):
         print(x)
-        data.append([ x.value for x in jast.run((x,))])
+        data.append([x.value for x in jast.run((x, ))])
         print(data[-1])
 
     import pickle
     with open('jast_opt.pickle', 'wb') as f:
         pickle.dump(data, f)
-
-

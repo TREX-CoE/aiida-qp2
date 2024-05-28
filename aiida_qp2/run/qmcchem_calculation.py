@@ -16,10 +16,10 @@ from pymatgen.core.periodic_table import Element
 
 QP2RunCalculation = CalculationFactory('qp2.run')
 
+
 class QP2QmcchemRunCalculation(QP2RunCalculation):
     """ AiiDA calculation plugin wrapping the Quantum Package code.
     """
-
     @classmethod
     def define(cls, spec):
         """ Define inputs and outputs of the calculation."""
@@ -27,4 +27,3 @@ class QP2QmcchemRunCalculation(QP2RunCalculation):
         super().define(spec)
 
         spec.inputs['metadata']['options']['parser_name'].default = 'qp2.qmcchemrun'
-

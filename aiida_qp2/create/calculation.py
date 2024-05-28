@@ -47,13 +47,13 @@ class QP2CreateCalculation(CalcJob):
         spec.input('basis_set',
                    valid_type=Str,
                    required=False,
-                   default=lambda: Str("cc-pvdz"),
+                   default=lambda: Str('cc-pvdz'),
                    help='The basis set to use for this calculation.')
 
         spec.input('pseudo_potential',
                    valid_type=Str,
                    required=False,
-                   default=lambda: Str(""),
+                   default=lambda: Str(''),
                    help='The pseudo potential to use for this calculation.')
 
 
@@ -100,8 +100,8 @@ class QP2CreateCalculation(CalcJob):
         # TODO: Check if basis set is valid
 
         with folder.open(self._INPUT_FILE, 'w') as handle:
-            handle.write(f"qp create_ezfio -b {basis_set} {self._INPUT_COORDS_FILE}\n")
-            handle.write(f"tar czf {self.metadata.options.output_wf_basename}.tar.gz *.ezfio\n")
+            handle.write(f'qp create_ezfio -b {basis_set} {self._INPUT_COORDS_FILE}\n')
+            handle.write(f'tar czf {self.metadata.options.output_wf_basename}.tar.gz *.ezfio\n')
 
         with folder.open(self._INPUT_COORDS_FILE, 'w') as handle:
             structure = self.inputs.structure.get_ase()
@@ -124,7 +124,6 @@ class QP2CreateCalculation(CalcJob):
         calcinfo.local_copy_list = []
         calcinfo.retrieve_list = [self._INPUT_COORDS_FILE,
                                   self.metadata.options.output_filename,
-                                  f"{self.metadata.options.output_wf_basename}.tar.gz"]
+                                  f'{self.metadata.options.output_wf_basename}.tar.gz']
 
         return calcinfo
-

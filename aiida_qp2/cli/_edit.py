@@ -12,17 +12,29 @@ from .cli_helpers import wf_option, code_option
 
 from . import cli_root
 
-@cli_root.group("edit")
+
+@cli_root.group('edit')
 def edit():
     """
     Edit a Wavefunction
     """
     pass
 
-@edit.command("operation")
+
+@edit.command('operation')
 @wf_option
-@click.option("-g", "--get", type=click.STRING, nargs=1, multiple=True, help="Get the value of a parameter")
-@click.option("-s", "--set", type=click.STRING, nargs=2, multiple=True, help="Set the value of a parameter")
+@click.option('-g',
+              '--get',
+              type=click.STRING,
+              nargs=1,
+              multiple=True,
+              help='Get the value of a parameter')
+@click.option('-s',
+              '--set',
+              type=click.STRING,
+              nargs=2,
+              multiple=True,
+              help='Set the value of a parameter')
 @decorators.with_dbenv()
 def edit_operation(wavefunction, get, set):
     """
@@ -30,35 +42,36 @@ def edit_operation(wavefunction, get, set):
     """
 
     if not wavefunction:
-        echo.echo_critical("No wavefunction specified")
+        echo.echo_critical('No wavefunction specified')
         return
 
-    echo.echo(f"Editing wavefunction {wavefunction.pk}")
+    echo.echo(f'Editing wavefunction {wavefunction.pk}')
 
     operations = []
 
     if set:
         for key, value in set:
-            operations.append(("set", key, value))
+            operations.append(('set', key, value))
 
     if get:
         for key in get:
-            operations.append(("get", key, None))
+            operations.append(('get', key, None))
 
     from aiida_qp2.utils.wavefunction_handler import wavefunction_handler
     from aiida.orm import List
 
-    ret  = wavefunction_handler(wavefunction, List(operations))
+    ret = wavefunction_handler(wavefunction, List(operations))
 
-    if "data" in ret:
-        data = ret["data"].get_list()
+    if 'data' in ret:
+        data = ret['data'].get_list()
         for line in data:
             echo.echo_dictionary(line)
 
-    if "wavefunction" in ret:
-        echo.echo_success("Wavefunction edited")
+    if 'wavefunction' in ret:
+        echo.echo_success('Wavefunction edited')
 
-@edit.command("interactive")
+
+@edit.command('interactive')
 @wf_option
 @decorators.with_dbenv()
 def edit_interactive(wavefunction):
@@ -67,10 +80,10 @@ def edit_interactive(wavefunction):
     """
 
     if not wavefunction:
-        echo.echo_critical("No wavefunction specified")
+        echo.echo_critical('No wavefunction specified')
         return
 
-    _WF_NAME = "wavefunction.wf.tar.gz"
+    _WF_NAME = 'wavefunction.wf.tar.gz'
     from aiida_qp2.utils.ezfio import ezfio
     import tempfile
     import tarfile
@@ -85,42 +98,47 @@ def edit_interactive(wavefunction):
         # untar the wavefunction
         with tarfile.open(wf_path, 'r:gz') as tar:
             tar.extractall(temp_dir)
-        ezfio_path = os.path.join(temp_dir, "aiida.ezfio")
+        ezfio_path = os.path.join(temp_dir, 'aiida.ezfio')
         ezfio.set_file(ezfio_path)
-        echo.echo("")
-        echo.echo("#"*80)
-        echo.echo("")
-        echo.echo("You can now edit the wavefunction (wf) using the ezfio object")
-        echo.echo("")
+        echo.echo('')
+        echo.echo('#' * 80)
+        echo.echo('')
+        echo.echo(
+            'You can now edit the wavefunction (wf) using the ezfio object')
+        echo.echo('')
         echo.echo("Example: wf.set_jastrow_j2e_type('Mu')")
         echo.echo("         wf.set_jastrow_j1e_type('None')")
         echo.echo("         wf.get_jastrow_j2e_type('Mu')")
         echo.echo("         [Out]: 'Mu'")
-        echo.echo("")
-        echo.echo_warning("This is not (yet) a calcjob! The changes are not logged, and the provenance is not tracked")
-        echo.echo("")
-        echo.echo("#"*80)
-        echo.echo("")
+        echo.echo('')
+        echo.echo_warning(
+            'This is not (yet) a calcjob! The changes are not logged, and the provenance is not tracked'
+        )
+        echo.echo('')
+        echo.echo('#' * 80)
+        echo.echo('')
 
-        start_ipython(argv=[], user_ns={"wf": ezfio})
+        start_ipython(argv=[], user_ns={'wf': ezfio})
 
-        click.confirm("Do you want to save the changes?", default=True, abort=True)
+        click.confirm('Do you want to save the changes?',
+                      default=True,
+                      abort=True)
         from aiida.orm import SinglefileData
 
         with tarfile.open(wf_path, 'w:gz') as tar:
-            tar.add(ezfio_path, arcname="aiida.ezfio")
+            tar.add(ezfio_path, arcname='aiida.ezfio')
         with open(wf_path, 'rb') as handle:
             wavefunction = SinglefileData(file=handle)
-            wavefunction.base.attributes.all["wavefunction"] = True
+            wavefunction.base.attributes.all['wavefunction'] = True
             wavefunction.store()
 
-        echo.echo_success(f"Wavefunction edited and stored (pk={wavefunction.pk})")
+        echo.echo_success(
+            f'Wavefunction edited and stored (pk={wavefunction.pk})')
 
 
-
-@edit.command("from_file")
+@edit.command('from_file')
 @wf_option
-@click.argument("file", type=click.Path(exists=True))
+@click.argument('file', type=click.Path(exists=True))
 @decorators.with_dbenv()
 def edit_from_file(wavefunction, file):
     """
@@ -128,7 +146,7 @@ def edit_from_file(wavefunction, file):
     """
 
     if not wavefunction:
-        echo.echo_critical("No wavefunction specified")
+        echo.echo_critical('No wavefunction specified')
         return
 
     from aiida.orm import SinglefileData
@@ -136,34 +154,33 @@ def edit_from_file(wavefunction, file):
 
     operations = []
     with open(file, 'r') as handle:
-        getter = re.compile(r"get\s+(\w+)")
+        getter = re.compile(r'get\s+(\w+)')
         setter = re.compile(r'set\s+(\w+)\s+"([^"]*)"')
         for line in handle:
             match = getter.match(line)
             if match:
                 key = match.group(1)
-                operations.append(("get", key, None))
+                operations.append(('get', key, None))
                 continue
             match = setter.match(line)
             if match:
                 key = match.group(1)
                 value = match.group(2)
-                operations.append(("set", key, value))
+                operations.append(('set', key, value))
                 continue
 
     from aiida_qp2.utils.wavefunction_handler import wavefunction_handler
     from aiida.orm import List
 
-    ret  = wavefunction_handler(wavefunction, List(operations))
+    ret = wavefunction_handler(wavefunction, List(operations))
 
-    if "data" in ret:
-        data = ret["data"].get_list()
+    if 'data' in ret:
+        data = ret['data'].get_list()
         for line in data:
             echo.echo_dictionary(line)
 
-    if "wavefunction" in ret:
-        echo.echo_success(f"Wavefunction edited and stored (pk={wavefunction.pk})")
+    if 'wavefunction' in ret:
+        echo.echo_success(
+            f'Wavefunction edited and stored (pk={wavefunction.pk})')
     else:
-        echo.echo("Wavefunction unmofified")
-
-
+        echo.echo('Wavefunction unmofified')

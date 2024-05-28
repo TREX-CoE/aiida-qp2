@@ -17,8 +17,8 @@ Code = DataFactory('core.code')
 
 Calculation = CalculationFactory('qp2.run')
 
-class JastOpt():
 
+class JastOpt():
     def __init__(self,
                  wavefunction: SinglefileData,
                  code: Code,
@@ -50,6 +50,5 @@ class JastOpt():
 
     def set_parameters(self, parameters):
         operation = self.parameter_setter(parameters)
-        self.wavefunction = wavefunction_handler(self._wavefunction, operation)["wavefunction"]
-
-
+        self.wavefunction = wavefunction_handler(self._wavefunction,
+                                                 operation)['wavefunction']

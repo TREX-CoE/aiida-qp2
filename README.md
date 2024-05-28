@@ -6,7 +6,7 @@
 This is a brief installation guide fo aiida-qp2. First one needs to setup properly `aiida` it should be installed when package is installed. Also RabbitMQ is importat to run `aiida`.
 
 ```
-# It is better to run it in some kind of virtual environment. 
+# It is better to run it in some kind of virtual environment.
 
 $ pip install aiida-qp2
 ```
@@ -71,7 +71,7 @@ use_double_quotes: false
 image_name: 'qp2-aiida'
 label: 'qp2-docker'
 description: 'quantum package 2'
-default_calc_job_plugin: 
+default_calc_job_plugin:
   - 'qp2.create'
   - 'qp2.run'
 filepath_executable: '/bin/entrypoint.sh'

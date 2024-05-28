@@ -120,7 +120,7 @@ class QP2RunCalculation(CalcJob):
         with folder.open(self._INPUT_FILE, 'w') as handle:
             self._write_input_file(handle)
 
-        with folder.open("aiida.wf.tar.gz", 'wb') as handle, self.inputs.wavefunction.open(mode='rb') as handle_wf:
+        with folder.open('aiida.wf.tar.gz', 'wb') as handle, self.inputs.wavefunction.open(mode='rb') as handle_wf:
             handle.write(handle_wf.read())
 
         # Prepare a `CodeInfo` to be returned to the engine
@@ -138,7 +138,7 @@ class QP2RunCalculation(CalcJob):
 
         calcinfo.local_copy_list = []
         calcinfo.retrieve_list = [self.metadata.options.output_filename,
-                                  f"{self.metadata.options.output_wf_basename}.tar.gz"]
+                                  f'{self.metadata.options.output_wf_basename}.tar.gz']
 
         return calcinfo
 
@@ -150,36 +150,36 @@ class QP2RunCalculation(CalcJob):
         tbf = self.inputs.parameters.get_dict().get('trexio_bug_fix', False)
         append = self.inputs.parameters.get_dict().get('qp_append', '')
 
-        if run_type == "none":
-            raise ValueError("run_type not specified in parameters")
+        if run_type == 'none':
+            raise ValueError('run_type not specified in parameters')
 
-        code_command = "qp"
-        config_command = "set"
-        run_command = f"qp run {run_type} {append}"
-        ezfio = ""
+        code_command = 'qp'
+        config_command = 'set'
+        run_command = f'qp run {run_type} {append}'
+        ezfio = ''
 
-        if run_type == "qmcchem":
-            code_command = "qmcchem"
-            config_command = "edit"
-            run_command = "qmcchem run aiida.ezfio"
-            ezfio = "aiida.ezfio"
+        if run_type == 'qmcchem':
+            code_command = 'qmcchem'
+            config_command = 'edit'
+            run_command = 'qmcchem run aiida.ezfio'
+            ezfio = 'aiida.ezfio'
 
-        handle.write("#!/bin/bash\n")
-        handle.write("set -e\n")
-        handle.write("set -x\n")
-        handle.write("tar xzf aiida.wf.tar.gz\n")
-        handle.write(f"qp set_file aiida.ezfio\n")
+        handle.write('#!/bin/bash\n')
+        handle.write('set -e\n')
+        handle.write('set -x\n')
+        handle.write('tar xzf aiida.wf.tar.gz\n')
+        handle.write(f'qp set_file aiida.ezfio\n')
 
         # Iter over prepend parameters
         if self.inputs.parameters.get_dict().get('qp_prepend', None):
             for value in self.inputs.parameters.get_dict().get('qp_prepend'):
-                handle.write(f"{code_command} {config_command} {value} {ezfio}\n")
+                handle.write(f'{code_command} {config_command} {value} {ezfio}\n')
 
-        handle.write(run_command + "\n")
+        handle.write(run_command + '\n')
 
         if tbf:
             handle.write(f'sed -i "1s|^|$(pwd)/|" aiida.ezfio/trexio/trexio_file\n')
 
         handle.write(f'echo "#*#* ERROR CODE: $? #*#*"\n')
-        handle.write(f"tar czf {self.metadata.options.output_wf_basename}.tar.gz *.ezfio\n")
+        handle.write(f'tar czf {self.metadata.options.output_wf_basename}.tar.gz *.ezfio\n')
 #EOF

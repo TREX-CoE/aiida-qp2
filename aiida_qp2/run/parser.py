@@ -16,10 +16,12 @@ import json
 
 QP2RunCalculation = CalculationFactory('qp2.run')
 
-_DICTIONARIES = { "scf": "hartree_fock",
-                 "ccsd": "ccsd",
-                 "fci": "fci",
-               }
+_DICTIONARIES = {
+    'scf': 'hartree_fock',
+    'ccsd': 'ccsd',
+    'fci': 'fci',
+}
+
 
 class QP2RunParser(Parser):
     """
@@ -45,13 +47,12 @@ class QP2RunParser(Parser):
         :returns: an exit code, if parsing fails (or nothing if parsing succeeds)
         """
 
-        output_filename = self.node.get_option(
-            'output_filename')
+        output_filename = self.node.get_option('output_filename')
 
         run_type = self.node.inputs.parameters.get_dict().get('run_type')
 
         with self.retrieved.open(output_filename, 'r') as handle:
-            regex = re.compile(r"ERROR CODE: (\d+)")
+            regex = re.compile(r'ERROR CODE: (\d+)')
             for line in handle:
                 match = regex.match(line)
                 if match:
@@ -61,12 +62,9 @@ class QP2RunParser(Parser):
         if run_type == 'qmcchem':
             return self.parse_qmcchem()
 
-        output_wf_basename = self.node.get_option(
-            'output_wf_basename')
+        output_wf_basename = self.node.get_option('output_wf_basename')
         output_wf_filename = output_wf_basename + '.tar.gz'
-        store_wavefunction = self.node.get_option(
-            'store_wavefunction')
-
+        store_wavefunction = self.node.get_option('store_wavefunction')
 
         try:
             out_folder = self.retrieved
@@ -84,12 +82,14 @@ class QP2RunParser(Parser):
         import tarfile
         method = _DICTIONARIES.get(run_type, None)
         if method:
-            path_energy = f"aiida.ezfio/{method}/energy"
+            path_energy = f'aiida.ezfio/{method}/energy'
             with out_folder.open(output_wf_filename, 'rb') as wf_out:
-                with tarfile.open(fileobj=wf_out, mode= "r") as tar:
+                with tarfile.open(fileobj=wf_out, mode='r') as tar:
                     f_out = tar.extractfile(path_energy)
                     if f_out is None:
-                        raise exceptions.ParsingError(f"File {path_energy} not found in wavefunction file")
+                        raise exceptions.ParsingError(
+                            f'File {path_energy} not found in wavefunction file'
+                        )
                     from aiida.orm import Float
                     self.out('output_energy', Float(float(f_out.read())))
         else:
@@ -100,18 +100,15 @@ class QP2RunParser(Parser):
             with out_folder.open(output_wf_filename, 'rb') as handle:
                 wf_file = SinglefileData(file=handle)
 
-            wf_file.base.attributes.set("wavefunction", True)
+            wf_file.base.attributes.set('wavefunction', True)
             self.out('output_wavefunction', wf_file)
 
     def parse_qmcchem(self, **kwargs):
 
-        output_filename = self.node.get_option(
-            'output_filename')
-        output_wf_basename = self.node.get_option(
-            'output_wf_basename')
+        output_filename = self.node.get_option('output_filename')
+        output_wf_basename = self.node.get_option('output_wf_basename')
         output_wf_filename = output_wf_basename + '.tar.gz'
-        store_wavefunction = self.node.get_option(
-            'store_wavefunction')
+        store_wavefunction = self.node.get_option('store_wavefunction')
 
         try:
             out_folder = self.retrieved
@@ -133,11 +130,12 @@ class QP2RunParser(Parser):
         number_of_blocks = None
         with out_folder.open(output_filename, 'r') as handle:
             for line in handle:
-                if "          E_loc :" in line:
+                if '          E_loc :' in line:
                     energy = float(line.split()[2])
                     energy_err = float(line.split()[4])
-                    number_of_blocks = int(line.split()[5].replace("(","").replace(")",""))
-                if "   E_loc_qmcvar :" in line:
+                    number_of_blocks = int(line.split()[5].replace(
+                        '(', '').replace(')', ''))
+                if '   E_loc_qmcvar :' in line:
                     energy_qmcvar = float(line.split()[2])
                     energy_qmcvar_err = float(line.split()[4])
         if energy:
@@ -156,7 +154,7 @@ class QP2RunParser(Parser):
             with out_folder.open(output_wf_filename, 'rb') as handle:
                 wf_file = SinglefileData(file=handle)
 
-            wf_file.base.attributes.set("wavefunction", True)
+            wf_file.base.attributes.set('wavefunction', True)
             self.out('output_wavefunction', wf_file)
 
     def _json_reader(self, out_folder):

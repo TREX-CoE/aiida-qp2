@@ -64,12 +64,12 @@ class QP2CreateParser(Parser):
             wf_file = SinglefileData(file=handle)
 
         # Read the structure from the input file
-        with out_folder.open("aiida.xyz", 'r') as handle:
+        with out_folder.open('aiida.xyz', 'r') as handle:
             atoms = read(handle, format='xyz')
 
         # Set the wavefunction as an attribute of the output node
-        wf_file.base.attributes.set("wavefunction", True)
-        wf_file.base.attributes.set("formula", atoms.get_chemical_formula())
+        wf_file.base.attributes.set('wavefunction', True)
+        wf_file.base.attributes.set('formula', atoms.get_chemical_formula())
 
         self.out('wavefunction', wf_file)
 
