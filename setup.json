@@ -14,19 +14,31 @@
     ],
     "version": "0.3.0",
     "entry_points": {
+	"console_scripts": [
+	    "aqp = aiida_qp2.cli:cli_root"
+	],
+	"aiida.cmdline.data": [
+	    "qp2.cli = aiida_qp2.cli:cli_root"
+        ],
         "aiida.calculations": [
-            "qp2 = aiida_qp2.calculations:QP2Calculation"
+            "qp2 = aiida_qp2.calculations:QP2Calculation",
+            "qp2.create = aiida_qp2.create.calculation:QP2CreateCalculation",
+            "qp2.run = aiida_qp2.run.calculation:QP2RunCalculation",
+            "qp2.qmcchemrun = aiida_qp2.run.qmcchem_calculation:QP2QmcchemRunCalculation"
         ],
         "aiida.parsers": [
-            "qp2 = aiida_qp2.parsers:QP2Parser"
+            "qp2 = aiida_qp2.parsers:QP2Parser",
+	    "qp2.create = aiida_qp2.create.parser:QP2CreateParser",
+	    "qp2.run = aiida_qp2.run.parser:QP2RunParser",
+	    "qp2.qmcchemrun = aiida_qp2.run.qmcchem_parser:QP2QmcchemRunParser"
         ]
     },
     "include_package_data": true,
     "setup_requires": ["reentry"],
     "reentry_register": true,
     "install_requires": [
-        "aiida-core>=1.1.0,<2.0.0",
-        "sqlalchemy<1.4",
+        "aiida-core>=2.1.0,<3.0.0",
+        "ase",
         "six",
         "psycopg2-binary<2.9",
         "voluptuous",
